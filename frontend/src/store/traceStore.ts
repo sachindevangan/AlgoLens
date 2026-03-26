@@ -1,9 +1,10 @@
 import { create } from "zustand";
-import type { TraceResult } from "../types";
+import type { TraceResult, VariableType } from "../types";
 
 type TraceStoreState = {
   code: string;
   trace: TraceResult | null;
+  detectedTypes: Record<string, VariableType>;
   currentStep: number;
   isRunning: boolean;
   isPlaying: boolean;
@@ -12,6 +13,7 @@ type TraceStoreState = {
 
   setCode: (code: string) => void;
   setTrace: (trace: TraceResult) => void;
+  setDetectedTypes: (types: Record<string, VariableType>) => void;
   setCurrentStep: (step: number) => void;
   nextStep: () => void;
   prevStep: () => void;
@@ -25,6 +27,7 @@ type TraceStoreState = {
 export const useTraceStore = create<TraceStoreState>((set, get) => ({
   code: "",
   trace: null,
+  detectedTypes: {},
   currentStep: 0,
   isRunning: false,
   isPlaying: false,
@@ -33,6 +36,7 @@ export const useTraceStore = create<TraceStoreState>((set, get) => ({
 
   setCode: (code) => set({ code }),
   setTrace: (trace) => set({ trace, currentStep: 0, error: null }),
+  setDetectedTypes: (types) => set({ detectedTypes: types }),
   setCurrentStep: (step) => set({ currentStep: Math.max(0, step) }),
 
   nextStep: () => {
@@ -55,6 +59,7 @@ export const useTraceStore = create<TraceStoreState>((set, get) => ({
   reset: () =>
     set({
       trace: null,
+      detectedTypes: {},
       currentStep: 0,
       error: null,
       isRunning: false,

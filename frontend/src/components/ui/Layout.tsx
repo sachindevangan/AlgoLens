@@ -82,7 +82,7 @@ export default function Layout() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.25, ease: "easeOut" }}
-          className="p-6"
+          className="p-6 h-full"
         >
           <Outlet />
         </motion.div>

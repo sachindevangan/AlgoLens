@@ -1,0 +1,24 @@
+You are building AlgoLens — a premium local DSA visualization platform.
+
+STACK: React 18 + TypeScript + Vite + Tailwind CSS + Framer Motion + 
+Zustand + React Flow + D3 + Monaco Editor. Backend: FastAPI + Python.
+
+DESIGN SYSTEM:
+- Background: #08080F, Surface: #0F0F1A, Border: #1E1E2E
+- Primary: #7C3AED (violet), Accent: #06B6D4 (cyan)
+- Success: #10B981, Warning: #F59E0B, Danger: #EF4444
+- Text: #E2E8F0, Muted: #64748B
+- Fonts: Inter for UI, JetBrains Mono for all code
+
+RULES:
+- Every meaningful state change must use framer-motion animation
+- Use Tailwind exclusively. Zero inline styles. Zero CSS modules.
+- All components fully typed. Never use `any`.
+- Zustand for all global state. No prop drilling beyond 2 levels.
+- All FastAPI responses are typed Pydantic models.
+- Visualizer components live in /components/visualizers/
+- Components are small and single-responsibility.
+- Use lucide-react for all icons, never emoji as UI elements.
+- Code must look production-grade. No placeholders, no TODO comments, 
+  no lorem ipsum. If something isn't built yet, return a proper 
+  skeleton/loading state instead.
