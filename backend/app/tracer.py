@@ -15,6 +15,25 @@ def _serialize_value(value: Any, *, _visited: set[int], _depth: int, _max_depth:
     if _depth > _max_depth:
         return {"type": "max_depth"}
 
+    function_like_type_names = {
+        "function",
+        "method",
+        "builtin_function_or_method",
+        "module",
+        "type",
+        "classobj",
+    }
+    try:
+        if callable(value):
+            return "<function>"
+    except Exception:
+        # If `callable()` fails for any reason, fall through to type-name checks.
+        pass
+    if type(value).__name__ in function_like_type_names:
+        return "<function>"
+    if isinstance(value, type):
+        return "<function>"
+
     if _is_primitive(value):
         return value
 
@@ -131,6 +150,21 @@ def trace_code(code: str, timeout: int) -> TraceResult:
         variables: dict[str, Any] = {}
         for name, value in local_vars.items():
             if name.startswith("__"):
+                continue
+            function_like_type_names = {
+                "function",
+                "method",
+                "builtin_function_or_method",
+                "module",
+                "type",
+                "classobj",
+            }
+            # Skip function/method/module/class/builtin values.
+            if callable(value):
+                continue
+            if type(value).__name__ in function_like_type_names:
+                continue
+            if isinstance(value, type):
                 continue
             variables[name] = _serialize_value(
                 value,

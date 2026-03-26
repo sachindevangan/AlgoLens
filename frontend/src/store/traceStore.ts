@@ -1,10 +1,10 @@
 import { create } from "zustand";
-import type { TraceResult, VariableType } from "../types";
+import type { TraceResult } from "../types";
 
 type TraceStoreState = {
   code: string;
   trace: TraceResult | null;
-  detectedTypes: Record<string, VariableType>;
+  detectedTypes: Record<string, string>;
   currentStep: number;
   isRunning: boolean;
   isPlaying: boolean;
@@ -13,7 +13,7 @@ type TraceStoreState = {
 
   setCode: (code: string) => void;
   setTrace: (trace: TraceResult) => void;
-  setDetectedTypes: (types: Record<string, VariableType>) => void;
+  setDetectedTypes: (types: Record<string, string>) => void;
   setCurrentStep: (step: number) => void;
   nextStep: () => void;
   prevStep: () => void;

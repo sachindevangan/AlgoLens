@@ -12,6 +12,7 @@ import CodeEditor from "../../components/editor/CodeEditor";
 import StepControls from "../../components/controls/StepControls";
 import VariablePanel from "../../components/editor/VariablePanel";
 import type { VariableType, TraceResult } from "../../types";
+import VisualizerRouter from "../../components/visualizers/VisualizerRouter";
 
 const DEFAULT_CODE = `def two_sum(nums: list[int], target: int) -> list[int]:
     seen = {}
@@ -147,9 +148,21 @@ export default function PlaygroundPage() {
 
   const visualizationTypes = useMemo(() => {
     if (!trace) return [];
+    const allowed = new Set<VariableType>([
+      "array",
+      "array2d",
+      "stack",
+      "queue",
+      "tree",
+      "linkedlist",
+      "graph",
+      "hashmap",
+    ]);
+
     const unique = new Set<VariableType>();
     for (const type of Object.values(detectedTypes)) {
-      unique.add(normalizeVariableType(type));
+      const normalized = normalizeVariableType(type);
+      if (allowed.has(normalized)) unique.add(normalized);
     }
     return Array.from(unique.values());
   }, [detectedTypes, trace]);
@@ -198,7 +211,7 @@ export default function PlaygroundPage() {
       );
 
       const payload = response.data;
-      const normalizedDetected: Record<string, VariableType> = {};
+      const normalizedDetected: Record<string, string> = {};
       for (const [name, t] of Object.entries(payload.detected_types)) {
         normalizedDetected[name] = normalizeVariableType(t);
       }
@@ -326,7 +339,7 @@ export default function PlaygroundPage() {
             </div>
 
             <div className="relative flex-1 min-h-0 overflow-hidden">
-              <div className="h-full overflow-y-auto">
+              <div className="h-full overflow-hidden">
                 {!trace ? (
                   <div className="h-full flex flex-col items-center justify-center text-center gap-3 px-6">
                     <PlayCircle className="h-14 w-14 text-muted" />
@@ -350,18 +363,7 @@ export default function PlaygroundPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="h-full flex items-center justify-center text-center px-10">
-                    <div className="max-w-md">
-                      <div className="text-white text-lg font-semibold font-mono">
-                        Visualizer coming in next step
-                      </div>
-                      <div className="mt-2 text-muted text-sm font-mono">
-                        Your traced execution is already available in the right
-                        Variables panel. Use the controls below to step through
-                        execution state.
-                      </div>
-                    </div>
-                  </div>
+                  <VisualizerRouter detectedTypes={detectedTypes} />
                 )}
               </div>
 
