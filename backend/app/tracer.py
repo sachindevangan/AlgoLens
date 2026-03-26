@@ -1,5 +1,6 @@
 import sys
 import threading
+import collections
 from copy import deepcopy
 from io import StringIO
 from typing import Any, Optional
@@ -42,10 +43,55 @@ def _serialize_value(value: Any, *, _visited: set[int], _depth: int, _max_depth:
         return {"type": "cycle"}
 
     # Mark as visited for container/object types; keep primitives as-is.
-    if isinstance(value, (dict, list, tuple, set)) or hasattr(value, "left") or hasattr(value, "right") or hasattr(value, "next"):
+    if (
+        isinstance(value, (dict, list, tuple, set, collections.deque))
+        or (isinstance(value, collections.abc.Sequence) and not isinstance(value, (str, bytes, bytearray)))
+        or isinstance(value, collections.abc.Mapping)
+        or hasattr(value, "left")
+        or hasattr(value, "right")
+        or hasattr(value, "next")
+    ):
         _visited.add(value_id)
 
     try:
+        # collections.deque: serialize as list
+        if isinstance(value, collections.deque):
+            return [
+                _serialize_value(v, _visited=_visited, _depth=_depth + 1, _max_depth=_max_depth)
+                for v in list(value)
+            ]
+
+        # collections.OrderedDict: serialize as regular dict
+        if isinstance(value, collections.OrderedDict):
+            out: dict[str, Any] = {}
+            for k, v in value.items():
+                key_out: str
+                if _is_primitive(k):
+                    key_out = str(k)
+                else:
+                    key_out = repr(k)
+                out[key_out] = _serialize_value(v, _visited=_visited, _depth=_depth + 1, _max_depth=_max_depth)
+            return out
+
+        # Any other sequence (but not strings/bytes): serialize as list
+        if isinstance(value, collections.abc.Sequence) and not isinstance(value, (str, bytes, bytearray)):
+            return [
+                _serialize_value(v, _visited=_visited, _depth=_depth + 1, _max_depth=_max_depth)
+                for v in list(value)
+            ]
+
+        # Any mapping: serialize as dict
+        if isinstance(value, collections.abc.Mapping):
+            out: dict[str, Any] = {}
+            for k, v in value.items():
+                key_out: str
+                if _is_primitive(k):
+                    key_out = str(k)
+                else:
+                    key_out = repr(k)
+                out[key_out] = _serialize_value(v, _visited=_visited, _depth=_depth + 1, _max_depth=_max_depth)
+            return out
+
         if isinstance(value, dict):
             out: dict[str, Any] = {}
             for k, v in value.items():
@@ -96,9 +142,23 @@ def _serialize_value(value: Any, *, _visited: set[int], _depth: int, _max_depth:
             }
 
         # Fallback: represent custom objects safely.
+        if hasattr(value, "__dict__"):
+            try:
+                keys = set(getattr(value, "__dict__", {}).keys())
+                if keys == {"type", "repr"}:
+                    return "<object>"
+            except Exception:
+                pass
         return {"type": value.__class__.__name__, "repr": repr(value)}
     finally:
-        if isinstance(value, (dict, list, tuple, set)) or hasattr(value, "left") or hasattr(value, "right") or hasattr(value, "next"):
+        if (
+            isinstance(value, (dict, list, tuple, set, collections.deque))
+            or (isinstance(value, collections.abc.Sequence) and not isinstance(value, (str, bytes, bytearray)))
+            or isinstance(value, collections.abc.Mapping)
+            or hasattr(value, "left")
+            or hasattr(value, "right")
+            or hasattr(value, "next")
+        ):
             # Note: keep visited entries to prevent deep cycles across branches;
             # removing here would allow re-entrance and could loop again.
             pass

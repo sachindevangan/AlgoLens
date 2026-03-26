@@ -108,3 +108,14 @@ body::before {
   z-index: -1;
 }
 
+.react-flow__controls-button {
+  background: #0f0f1a;
+  border-bottom: 1px solid #1e1e2e;
+  color: #e2e8f0;
+  fill: #e2e8f0;
+}
+
+.react-flow__controls-button:hover {
+  background: #1e1e2e;
+}
+

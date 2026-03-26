@@ -1,10 +1,14 @@
-import { TreePine } from "lucide-react";
-import type { ReactNode } from "react";
 import { useMemo } from "react";
 import { useTraceStore } from "../../store/traceStore";
 import ArrayVisualizer from "./ArrayVisualizer";
 import StackVisualizer from "./StackVisualizer";
 import HashmapVisualizer from "./HashmapVisualizer";
+import TreeVisualizer from "./TreeVisualizer";
+import GraphVisualizer from "./GraphVisualizer";
+import GridVisualizer from "./GridVisualizer";
+import LinkedListVisualizer, {
+  flattenLinkedList,
+} from "./LinkedListVisualizer";
 
 type VisualizerRouterProps = {
   detectedTypes: Record<string, string>;
@@ -27,9 +31,19 @@ type VisualizableVar = {
 };
 
 type PointerCandidate = { name: string; value: number };
+type TreeLikeNode = { val: unknown; left?: unknown; right?: unknown };
 
 function isIntegerNumber(v: unknown): v is number {
   return typeof v === "number" && Number.isInteger(v);
+}
+
+function isTreeLikeNode(v: unknown): v is TreeLikeNode {
+  return (
+    typeof v === "object" &&
+    v !== null &&
+    !Array.isArray(v) &&
+    "val" in (v as Record<string, unknown>)
+  );
 }
 
 function toPrimitiveArray(
@@ -85,25 +99,6 @@ const pointerNames = [
 
 const pointerColors = ["#06B6D4", "#F59E0B", "#10B981"] as const;
 
-function PlaceholderCard({
-  title,
-  icon,
-}: {
-  title: string;
-  icon?: ReactNode;
-}) {
-  return (
-    <div className="rounded-xl border border-border bg-surface p-6 flex flex-col items-center justify-center text-center">
-      {icon ? (
-        <div className="mb-3 text-cyan">
-          {icon}
-        </div>
-      ) : null}
-      <div className="text-muted font-mono">{title}</div>
-    </div>
-  );
-}
-
 export default function VisualizerRouter({
   detectedTypes,
 }: VisualizerRouterProps) {
@@ -111,6 +106,18 @@ export default function VisualizerRouter({
   const currentStep = useTraceStore((s) => s.currentStep);
 
   const variables = trace?.steps[currentStep]?.variables ?? null;
+
+  const pointerIntValues = useMemo(() => {
+    if (!variables) return [];
+    const record = variables as Record<string, unknown>;
+    const out: number[] = [];
+    for (const pointerName of pointerNames) {
+      if (!(pointerName in record)) continue;
+      const v = record[pointerName];
+      if (isIntegerNumber(v)) out.push(v);
+    }
+    return out;
+  }, [variables]);
 
   const visualizable = useMemo(() => {
     if (!variables) return [];
@@ -270,6 +277,7 @@ export default function VisualizerRouter({
         {visualizable.map(({ name, value, vizType, badgeType }) => {
           const t = vizType;
           const pointersForVar = pointersByArrayVar.get(name) ?? [];
+          const record = variables as Record<string, unknown>;
 
           const pointers =
             pointersForVar.length > 0
@@ -288,6 +296,42 @@ export default function VisualizerRouter({
                   label: p.name,
                 }))
               : undefined;
+
+          const linkedNodes =
+            t === "linkedlist"
+              ? flattenLinkedList(
+                  value as unknown as { val: unknown; next?: unknown } | null,
+                )
+              : null;
+
+          const linkedHighlightIndices =
+            t === "linkedlist" && linkedNodes
+              ? pointerIntValues.filter(
+                  (idx) => idx >= 0 && idx < linkedNodes.length,
+                )
+              : undefined;
+
+          const treeHighlightValues =
+            t === "tree"
+              ? (() => {
+                  const highlighted: unknown[] = [];
+                  const visitLikeNames = ["node", "curr", "current", "visiting"];
+                  for (const candidateName of visitLikeNames) {
+                    const candidateValue = record[candidateName];
+                    if (isTreeLikeNode(candidateValue)) {
+                      highlighted.push(candidateValue.val);
+                    }
+                  }
+
+                  // During initial construction, briefly highlight root if present.
+                  if (currentStep <= 4) {
+                    const rootValue = record.root;
+                    if (isTreeLikeNode(rootValue)) highlighted.push(rootValue.val);
+                  }
+
+                  return highlighted;
+                })()
+              : [];
 
           return (
             <div key={name} className="flex flex-col">
@@ -321,24 +365,43 @@ export default function VisualizerRouter({
               ) : null}
 
               {t === "tree" ? (
-                <PlaceholderCard
-                  title="Tree Visualizer — next prompt"
-                  icon={<TreePine className="h-6 w-6" />}
+                <TreeVisualizer
+                  treeData={
+                    (value as { val: unknown; left?: unknown; right?: unknown }) ??
+                    null
+                  }
+                  highlightValues={treeHighlightValues}
+                  label={undefined}
                 />
               ) : null}
 
               {t === "linkedlist" ? (
-                <PlaceholderCard
-                  title="Linked List Visualizer — next prompt"
+                <LinkedListVisualizer
+                  nodes={linkedNodes}
+                  label={undefined}
+                  highlightIndices={linkedHighlightIndices}
                 />
               ) : null}
 
               {t === "graph" ? (
-                <PlaceholderCard title="Graph Visualizer — next prompt" />
+                <GraphVisualizer
+                  adjacencyList={
+                    (value as Record<string, (string | number)[]>) ?? {}
+                  }
+                  directed={
+                    name.toLowerCase().includes("directed") ||
+                    name.toLowerCase().includes("digraph")
+                  }
+                  highlightNodes={pointerIntValues}
+                  label={undefined}
+                />
               ) : null}
 
               {t === "array2d" ? (
-                <PlaceholderCard title="Grid Visualizer — next prompt" />
+                <GridVisualizer
+                  grid={value as unknown[][]}
+                  label={undefined}
+                />
               ) : null}
             </div>
           );
