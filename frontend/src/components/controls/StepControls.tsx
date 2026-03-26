@@ -64,9 +64,25 @@ export default function StepControls() {
           trace ? "opacity-100" : "opacity-40 pointer-events-none",
         ].join(" ")}
       >
-        <div className="text-sm text-muted font-mono">
-          {stepLabel}
-        </div>
+        <motion.div
+          key={`step-${currentStep}`}
+          className="text-sm text-muted font-mono flex items-center gap-3"
+          initial={{ opacity: 0, y: 4, scale: 1 }}
+          animate={{ opacity: 1, y: 0, scale: [1, 1.08, 1] }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
+        >
+          <span>{stepLabel}</span>
+          {isPlaying ? (
+            <motion.span
+              className="text-[11px] text-muted font-mono"
+              initial={{ opacity: 0.4 }}
+              animate={{ opacity: [0.4, 1, 0.4] }}
+              transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
+            >
+              ▶ Playing
+            </motion.span>
+          ) : null}
+        </motion.div>
 
         <div className="flex items-center gap-2">
           <motion.button

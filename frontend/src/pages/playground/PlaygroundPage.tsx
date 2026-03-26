@@ -6,6 +6,7 @@ import {
   PlayCircle,
   Loader2,
   X,
+  TriangleAlert,
 } from "lucide-react";
 import { useTraceStore } from "../../store/traceStore";
 import CodeEditor from "../../components/editor/CodeEditor";
@@ -240,9 +241,12 @@ export default function PlaygroundPage() {
     }
   };
 
+  const traceKey = trace ? `trace-${trace.total_steps}` : "trace-none";
+
   return (
     <div className="h-full flex flex-col overflow-hidden">
-      <div className="h-[52px] border-b border-border bg-surface flex items-center justify-between px-4">
+      <div className="relative h-[52px] bg-gradient-to-r from-[#0F0F1A] to-[#0A0A12] flex items-center justify-between px-4 overflow-hidden">
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#7C3AED] to-transparent opacity-70" />
         <div className="flex items-center gap-3">
           <div className="text-white font-semibold">Playground</div>
           <div className="px-2 py-1 rounded-full bg-border text-muted text-[12px] font-mono">
@@ -264,11 +268,29 @@ export default function PlaygroundPage() {
             Clear
           </button>
 
-          <button
+          <motion.button
             type="button"
             onClick={() => void onRun()}
             disabled={isRunning}
-            className="h-9 px-4 rounded-md text-white font-semibold bg-gradient-to-r from-primary to-cyan hover:brightness-110 transition disabled:opacity-40 disabled:hover:brightness-100 flex items-center gap-2"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
+            className="h-9 px-4 rounded-md text-white font-semibold bg-[linear-gradient(135deg,#7C3AED,#6D28D9)] hover:bg-[linear-gradient(135deg,#8B5CF6,#7C3AED)] hover:shadow-[0_0_20px_#7C3AED66] transition disabled:opacity-40 flex items-center gap-2 relative"
+            animate={
+              isRunning
+                ? {
+                    boxShadow: [
+                      "0 0 0 0 rgba(124,58,237,0.35)",
+                      "0 0 0 6px rgba(124,58,237,0.20)",
+                      "0 0 0 0 rgba(124,58,237,0.0)",
+                    ],
+                  }
+                : { boxShadow: "none" }
+            }
+            transition={
+              isRunning
+                ? { duration: 1.2, ease: "easeInOut", repeat: Infinity }
+                : undefined
+            }
           >
             {isRunning ? (
               <>
@@ -281,7 +303,7 @@ export default function PlaygroundPage() {
                 <span>Run &amp; Visualize</span>
               </>
             )}
-          </button>
+          </motion.button>
         </div>
       </div>
 
@@ -289,12 +311,15 @@ export default function PlaygroundPage() {
         {error && !dismissedTraceError ? (
           <motion.div
             key="error-banner"
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="bg-danger/10 border border-danger text-danger px-4 py-3 flex items-start justify-between gap-3"
+            className="bg-danger/10 border-l-4 border-danger text-danger px-4 py-3 flex items-start justify-between gap-3 shadow-[0_0_18px_rgba(239,68,68,0.35)]"
           >
-            <div className="text-sm font-mono whitespace-pre-wrap">{error}</div>
+            <div className="flex items-start gap-3">
+              <TriangleAlert className="h-5 w-5 mt-0.5" />
+              <div className="text-sm font-mono whitespace-pre-wrap">{error}</div>
+            </div>
             <button
               type="button"
               onClick={() => setDismissedTraceError(true)}
@@ -363,7 +388,15 @@ export default function PlaygroundPage() {
                     </div>
                   </div>
                 ) : (
-                  <VisualizerRouter detectedTypes={detectedTypes} />
+                  <motion.div
+                    key={traceKey}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                    className="h-full"
+                  >
+                    <VisualizerRouter detectedTypes={detectedTypes} />
+                  </motion.div>
                 )}
               </div>
 
