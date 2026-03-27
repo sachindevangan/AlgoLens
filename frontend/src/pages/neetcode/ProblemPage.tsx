@@ -6,6 +6,9 @@ import {
   ChevronRight,
   Eye,
   EyeOff,
+  FlaskConical,
+  X,
+  Check,
   Pause,
   Play,
   RotateCcw,
@@ -28,6 +31,22 @@ import type { TraceResult } from "../../types";
 type ExecuteResponsePayload = {
   trace: TraceResult;
   detected_types: Record<string, string>;
+};
+
+type TestCase = { args: string; expected: string };
+type TestCaseResult = {
+  case_number: number;
+  args: string;
+  expected: string;
+  actual: string;
+  passed: boolean;
+  error?: string | null;
+};
+type TestRunResponse = {
+  results: TestCaseResult[];
+  passed: number;
+  total: number;
+  all_passed: boolean;
 };
 
 function normalizeVariableType(type: string): string {
@@ -138,6 +157,8 @@ export default function ProblemPage() {
   const [isVisualizing, setIsVisualizing] = useState(false);
   const [solutionRevealed, setSolutionRevealed] = useState(false);
   const [showRevealConfirm, setShowRevealConfirm] = useState(false);
+  const [testResults, setTestResults] = useState<TestRunResponse | null>(null);
+  const [isRunningTests, setIsRunningTests] = useState(false);
 
   const code = useTraceStore((s) => s.code);
   const trace = useTraceStore((s) => s.trace);
@@ -228,6 +249,7 @@ export default function ProblemPage() {
     // eslint-disable-next-line no-console
     console.log("Loading starter for:", problemSlug);
     setSolutionRevealed(false);
+    setTestResults(null);
     reset();
     // Clear old solution drafts — if saved code looks like a solution (starts with "# Pattern:"), don't load it
     const existingDraft = storage.getDraft(problemSlug ?? "");
@@ -283,6 +305,38 @@ export default function ProblemPage() {
       setError(e instanceof Error ? e.message : "Execution failed");
     } finally {
       setIsRunning(false);
+    }
+  };
+
+  const runTests = async () => {
+    if (!problem) return;
+    if (!problem.functionName || !problem.testCases) return;
+    setIsRunningTests(true);
+    try {
+      const response = await axios.post<TestRunResponse>("http://localhost:8000/run-tests", {
+        code: useTraceStore.getState().code,
+        function_name: problem.functionName,
+        test_cases: problem.testCases as TestCase[],
+      });
+      setTestResults(response.data);
+    } catch (e: unknown) {
+      setTestResults({
+        results: [
+          {
+            case_number: 1,
+            args: "",
+            expected: "",
+            actual: "",
+            passed: false,
+            error: e instanceof Error ? e.message : "Failed to run tests",
+          },
+        ],
+        passed: 0,
+        total: 1,
+        all_passed: false,
+      });
+    } finally {
+      setIsRunningTests(false);
     }
   };
 
@@ -418,6 +472,83 @@ export default function ProblemPage() {
                   {tab === "description" ? (
                     <>
                       <p className="text-sm text-muted leading-relaxed">{problem.description}</p>
+                      <AnimatePresence>
+                        {testResults ? (
+                          <motion.div
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 8 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                            className="mt-5 rounded-xl border border-border bg-surface p-4"
+                          >
+                            <div className="flex items-center justify-between gap-3">
+                              <div className="text-white font-semibold">Test Results</div>
+                              <span
+                                className={`px-2 py-0.5 rounded-full text-xs border ${
+                                  testResults.all_passed
+                                    ? "text-[#10B981] border-[#10B98155] bg-[#10B98122]"
+                                    : "text-[#F59E0B] border-[#F59E0B55] bg-[#F59E0B22]"
+                                }`}
+                              >
+                                {testResults.passed} / {testResults.total} passed
+                              </span>
+                            </div>
+
+                            <div className="mt-3 space-y-2">
+                              {testResults.results.map((r) => {
+                                const shortArgs = r.args.length > 40 ? `${r.args.slice(0, 40)}…` : r.args;
+                                return (
+                                  <div
+                                    key={`case-${r.case_number}`}
+                                    className="flex items-start justify-between gap-3 rounded-lg border border-border bg-[#08080F] p-3"
+                                  >
+                                    <div className="flex items-start gap-2 min-w-0">
+                                      <div className="mt-0.5">
+                                        {r.passed ? (
+                                          <Check size={16} className="text-[#10B981]" />
+                                        ) : (
+                                          <X size={16} className="text-[#EF4444]" />
+                                        )}
+                                      </div>
+                                      <div className="min-w-0">
+                                        <div className="text-xs text-muted font-mono">
+                                          Case {r.case_number}{" "}
+                                          <span className="text-muted/70">({shortArgs})</span>
+                                        </div>
+                                        {!r.passed ? (
+                                          <div className="mt-1 text-xs text-[#EF4444]">
+                                            {r.error ? (
+                                              <>Error: {r.error}</>
+                                            ) : (
+                                              <>
+                                                Expected: {String(r.expected)} &nbsp; Got: {String(r.actual)}
+                                              </>
+                                            )}
+                                          </div>
+                                        ) : null}
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+
+                            {testResults.all_passed ? (
+                              <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="mt-4 text-sm text-[#10B981] font-semibold drop-shadow-[0_0_12px_rgba(16,185,129,0.35)]"
+                              >
+                                ✓ All tests passed!
+                              </motion.div>
+                            ) : (
+                              <div className="mt-4 text-sm text-[#EF4444] font-semibold">
+                                ✗ {testResults.total - testResults.passed} tests failed
+                              </div>
+                            )}
+                          </motion.div>
+                        ) : null}
+                      </AnimatePresence>
                       <div className="mt-5">
                         <h3 className="text-white font-medium mb-2">Examples</h3>
                         <div className="space-y-3">
@@ -496,6 +627,15 @@ export default function ProblemPage() {
                     </button>
                     <button
                       type="button"
+                      onClick={() => void runTests()}
+                      disabled={isRunningTests || !problem.functionName || !problem.testCases?.length}
+                      className="h-9 px-3 rounded-md border border-[#1E1E2E] text-muted inline-flex items-center gap-2 hover:border-[#10B98155] hover:text-[#10B981] disabled:opacity-40"
+                    >
+                      <FlaskConical size={14} />
+                      {isRunningTests ? "Running..." : "Run Tests"}
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => {
                         const draft = problemSlug ? storage.getDraft(problemSlug) : null;
                         const patternDisplay = patternSlug
@@ -537,6 +677,30 @@ export default function ProblemPage() {
                   <div className="flex-1 min-h-0">
                     <CodeEditor value={code} onChange={setCode} />
                   </div>
+                  <AnimatePresence>
+                    {showVisualizeMode && testResults ? (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 8 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="border-t border-[#1E1E2E] bg-[#0F0F1A] p-3"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="text-white font-semibold">Test Results</div>
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-xs border ${
+                              testResults.all_passed
+                                ? "text-[#10B981] border-[#10B98155] bg-[#10B98122]"
+                                : "text-[#F59E0B] border-[#F59E0B55] bg-[#F59E0B22]"
+                            }`}
+                          >
+                            {testResults.passed} / {testResults.total} passed
+                          </span>
+                        </div>
+                      </motion.div>
+                    ) : null}
+                  </AnimatePresence>
                   <div className="relative h-[120px] opacity-40 pointer-events-none">
                     <StepControls />
                   </div>

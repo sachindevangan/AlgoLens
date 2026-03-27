@@ -9,9 +9,16 @@ export type Problem = {
     explanation?: string;
   }[];
   constraints: string[];
+  functionName: string;
+  testCases: {
+    args: string;
+    expected: string;
+  }[];
 };
 
-export const NEETCODE_PROBLEMS: Record<string, Problem[]> = {
+type RawProblem = Omit<Problem, "functionName" | "testCases">;
+
+const RAW_NEETCODE_PROBLEMS: Record<string, RawProblem[]> = {
   "arrays-hashing": [
     {
       "slug": "two-sum",
@@ -3309,3 +3316,351 @@ export const NEETCODE_PROBLEMS: Record<string, Problem[]> = {
     }
   ]
 };
+
+type ProblemTestMeta = Pick<Problem, "functionName" | "testCases">;
+
+const PROVIDED_TESTS: Record<string, ProblemTestMeta> = {
+  "contains-duplicate": {
+    functionName: "containsDuplicate",
+    testCases: [
+      { args: "[1,2,3,1]", expected: "True" },
+      { args: "[1,2,3,4]", expected: "False" },
+      { args: "[1,1,1,3,3,4,3,2,4,2]", expected: "True" },
+    ],
+  },
+  "valid-anagram": {
+    functionName: "isAnagram",
+    testCases: [
+      { args: '"anagram", "nagaram"', expected: "True" },
+      { args: '"rat", "car"', expected: "False" },
+      { args: '"a", "a"', expected: "True" },
+    ],
+  },
+  "two-sum": {
+    functionName: "twoSum",
+    testCases: [
+      { args: "[2,7,11,15], 9", expected: "[0,1]" },
+      { args: "[3,2,4], 6", expected: "[1,2]" },
+      { args: "[3,3], 6", expected: "[0,1]" },
+    ],
+  },
+  "group-anagrams": {
+    functionName: "groupAnagrams",
+    testCases: [
+      { args: '["eat","tea","tan","ate","nat","bat"]', expected: '[["bat"],["nat","tan"],["ate","eat","tea"]]' },
+      { args: '[""]', expected: '[[""]]' },
+      { args: '["a"]', expected: '[["a"]]' },
+    ],
+  },
+  "top-k-frequent-elements": {
+    functionName: "topKFrequent",
+    testCases: [
+      { args: "[1,1,1,2,2,3], 2", expected: "[1,2]" },
+      { args: "[1], 1", expected: "[1]" },
+    ],
+  },
+  "product-of-array-except-self": {
+    functionName: "productExceptSelf",
+    testCases: [
+      { args: "[1,2,3,4]", expected: "[24,12,8,6]" },
+      { args: "[-1,1,0,-3,3]", expected: "[0,0,9,0,0]" },
+    ],
+  },
+  "longest-consecutive-sequence": {
+    functionName: "longestConsecutive",
+    testCases: [
+      { args: "[100,4,200,1,3,2]", expected: "4" },
+      { args: "[0,3,7,2,5,8,4,6,0,1]", expected: "9" },
+    ],
+  },
+  "valid-palindrome": {
+    functionName: "isPalindrome",
+    testCases: [
+      { args: '"A man, a plan, a canal: Panama"', expected: "True" },
+      { args: '"race a car"', expected: "False" },
+      { args: '" "', expected: "True" },
+    ],
+  },
+  "two-sum-ii-input-array-is-sorted": {
+    functionName: "twoSumII",
+    testCases: [
+      { args: "[2,7,11,15], 9", expected: "[1,2]" },
+      { args: "[2,3,4], 6", expected: "[1,3]" },
+      { args: "[-1,0], -1", expected: "[1,2]" },
+    ],
+  },
+  "3sum": {
+    functionName: "threeSum",
+    testCases: [
+      { args: "[-1,0,1,2,-1,-4]", expected: "[[-1,-1,2],[-1,0,1]]" },
+      { args: "[0,1,1]", expected: "[]" },
+      { args: "[0,0,0]", expected: "[[0,0,0]]" },
+    ],
+  },
+  "container-with-most-water": {
+    functionName: "maxArea",
+    testCases: [
+      { args: "[1,8,6,2,5,4,8,3,7]", expected: "49" },
+      { args: "[1,1]", expected: "1" },
+    ],
+  },
+  "trapping-rain-water": {
+    functionName: "trap",
+    testCases: [
+      { args: "[0,1,0,2,1,0,1,3,2,1,2,1]", expected: "6" },
+      { args: "[4,2,0,3,2,5]", expected: "9" },
+    ],
+  },
+  "best-time-to-buy-and-sell-stock": {
+    functionName: "maxProfit",
+    testCases: [
+      { args: "[7,1,5,3,6,4]", expected: "5" },
+      { args: "[7,6,4,3,1]", expected: "0" },
+    ],
+  },
+  "longest-substring-without-repeating-characters": {
+    functionName: "lengthOfLongestSubstring",
+    testCases: [
+      { args: '"abcabcbb"', expected: "3" },
+      { args: '"bbbbb"', expected: "1" },
+      { args: '"pwwkew"', expected: "3" },
+    ],
+  },
+  "longest-repeating-character-replacement": {
+    functionName: "characterReplacement",
+    testCases: [
+      { args: '"ABAB", 2', expected: "4" },
+      { args: '"AABABBA", 1', expected: "4" },
+    ],
+  },
+  "permutation-in-string": {
+    functionName: "checkInclusion",
+    testCases: [
+      { args: '"ab", "eidbaooo"', expected: "True" },
+      { args: '"ab", "eidboaoo"', expected: "False" },
+    ],
+  },
+  "minimum-window-substring": {
+    functionName: "minWindow",
+    testCases: [
+      { args: '"ADOBECODEBANC", "ABC"', expected: "BANC" },
+      { args: '"a", "a"', expected: "a" },
+      { args: '"a", "aa"', expected: "" },
+    ],
+  },
+  "sliding-window-maximum": {
+    functionName: "maxSlidingWindow",
+    testCases: [
+      { args: "[1,3,-1,-3,5,3,6,7], 3", expected: "[3,3,5,5,6,7]" },
+      { args: "[1], 1", expected: "[1]" },
+    ],
+  },
+  "valid-parentheses": {
+    functionName: "isValid",
+    testCases: [
+      { args: '"()"', expected: "True" },
+      { args: '"()[]{}"', expected: "True" },
+      { args: '"(]"', expected: "False" },
+      { args: '"([)]"', expected: "False" },
+    ],
+  },
+  "daily-temperatures": {
+    functionName: "dailyTemperatures",
+    testCases: [
+      { args: "[73,74,75,71,69,72,76,73]", expected: "[1,1,4,2,1,1,0,0]" },
+      { args: "[30,40,50,60]", expected: "[1,1,1,0]" },
+    ],
+  },
+  "car-fleet": {
+    functionName: "carFleet",
+    testCases: [
+      { args: "12, [10,8,0,5,3], [2,4,1,1,3]", expected: "3" },
+      { args: "10, [3], [3]", expected: "1" },
+    ],
+  },
+  "largest-rectangle-in-histogram": {
+    functionName: "largestRectangleArea",
+    testCases: [
+      { args: "[2,1,5,6,2,3]", expected: "10" },
+      { args: "[2,4]", expected: "4" },
+    ],
+  },
+  "binary-search": {
+    functionName: "search",
+    testCases: [
+      { args: "[-1,0,3,5,9,12], 9", expected: "4" },
+      { args: "[-1,0,3,5,9,12], 2", expected: "-1" },
+    ],
+  },
+  "search-a-2d-matrix": {
+    functionName: "searchMatrix",
+    testCases: [
+      { args: "[[1,3,5,7],[10,11,16,20],[23,30,34,60]], 3", expected: "True" },
+      { args: "[[1,3,5,7],[10,11,16,20],[23,30,34,60]], 13", expected: "False" },
+    ],
+  },
+  "koko-eating-bananas": {
+    functionName: "minEatingSpeed",
+    testCases: [
+      { args: "[3,6,7,11], 8", expected: "4" },
+      { args: "[30,11,23,4,20], 5", expected: "30" },
+    ],
+  },
+  "find-minimum-in-rotated-sorted-array": {
+    functionName: "findMin",
+    testCases: [
+      { args: "[3,4,5,1,2]", expected: "1" },
+      { args: "[4,5,6,7,0,1,2]", expected: "0" },
+      { args: "[11,13,15,17]", expected: "11" },
+    ],
+  },
+  "search-in-rotated-sorted-array": {
+    functionName: "searchRotated",
+    testCases: [
+      { args: "[4,5,6,7,0,1,2], 0", expected: "4" },
+      { args: "[4,5,6,7,0,1,2], 3", expected: "-1" },
+      { args: "[1], 0", expected: "-1" },
+    ],
+  },
+  "median-of-two-sorted-arrays": {
+    functionName: "findMedianSortedArrays",
+    testCases: [
+      { args: "[1,3], [2]", expected: "2.0" },
+      { args: "[1,2], [3,4]", expected: "2.5" },
+    ],
+  },
+  "reverse-linked-list": {
+    functionName: "reverseList",
+    testCases: [{ args: "None", expected: "None" }],
+  },
+  "linked-list-cycle": {
+    functionName: "hasCycle",
+    testCases: [{ args: "None", expected: "False" }],
+  },
+  "find-the-duplicate-number": {
+    functionName: "findDuplicate",
+    testCases: [
+      { args: "[1,3,4,2,2]", expected: "2" },
+      { args: "[3,1,3,4,2]", expected: "3" },
+    ],
+  },
+  "maximum-depth-of-binary-tree": {
+    functionName: "maxDepth",
+    testCases: [{ args: "None", expected: "0" }],
+  },
+  "climbing-stairs": {
+    functionName: "climbStairs",
+    testCases: [
+      { args: "2", expected: "2" },
+      { args: "3", expected: "3" },
+      { args: "5", expected: "8" },
+    ],
+  },
+  "coin-change": {
+    functionName: "coinChange",
+    testCases: [
+      { args: "[1,2,5], 11", expected: "3" },
+      { args: "[2], 3", expected: "-1" },
+    ],
+  },
+  "house-robber": {
+    functionName: "rob",
+    testCases: [
+      { args: "[1,2,3,1]", expected: "4" },
+      { args: "[2,7,9,3,1]", expected: "12" },
+    ],
+  },
+  "longest-increasing-subsequence": {
+    functionName: "lengthOfLIS",
+    testCases: [
+      { args: "[10,9,2,5,3,7,101,18]", expected: "4" },
+      { args: "[0,1,0,3,2,3]", expected: "4" },
+    ],
+  },
+  "number-of-islands": {
+    functionName: "numIslands",
+    testCases: [
+      {
+        args: '[[\"1\",\"1\",\"1\",\"1\",\"0\"],[\"1\",\"1\",\"0\",\"1\",\"0\"],[\"1\",\"1\",\"0\",\"0\",\"0\"],[\"0\",\"0\",\"0\",\"0\",\"0\"]]',
+        expected: "1",
+      },
+      {
+        args: '[[\"1\",\"1\",\"0\",\"0\",\"0\"],[\"1\",\"1\",\"0\",\"0\",\"0\"],[\"0\",\"0\",\"1\",\"0\",\"0\"],[\"0\",\"0\",\"0\",\"1\",\"1\"]]',
+        expected: "3",
+      },
+    ],
+  },
+  "course-schedule": {
+    functionName: "canFinish",
+    testCases: [
+      { args: "2, [[1,0]]", expected: "True" },
+      { args: "2, [[1,0],[0,1]]", expected: "False" },
+    ],
+  },
+  "maximum-subarray": {
+    functionName: "maxSubArray",
+    testCases: [
+      { args: "[-2,1,-3,4,-1,2,1,-5,4]", expected: "6" },
+      { args: "[1]", expected: "1" },
+      { args: "[5,4,-1,7,8]", expected: "23" },
+    ],
+  },
+  "jump-game": {
+    functionName: "canJump",
+    testCases: [
+      { args: "[2,3,1,1,4]", expected: "True" },
+      { args: "[3,2,1,0,4]", expected: "False" },
+    ],
+  },
+  "merge-intervals": {
+    functionName: "merge",
+    testCases: [
+      { args: "[[1,3],[2,6],[8,10],[15,18]]", expected: "[[1,6],[8,10],[15,18]]" },
+      { args: "[[1,4],[4,5]]", expected: "[[1,5]]" },
+    ],
+  },
+  "rotate-image": {
+    functionName: "rotate",
+    testCases: [
+      { args: "[[1,2,3],[4,5,6],[7,8,9]]", expected: "[[7,4,1],[8,5,2],[9,6,3]]" },
+    ],
+  },
+  "single-number": {
+    functionName: "singleNumber",
+    testCases: [
+      { args: "[2,2,1]", expected: "1" },
+      { args: "[4,1,2,1,2]", expected: "4" },
+      { args: "[1]", expected: "1" },
+    ],
+  },
+  "missing-number": {
+    functionName: "missingNumber",
+    testCases: [
+      { args: "[3,0,1]", expected: "2" },
+      { args: "[0,1]", expected: "2" },
+      { args: "[9,6,4,2,3,5,7,0,1]", expected: "8" },
+    ],
+  },
+};
+
+function slugToFunctionName(slug: string): string {
+  const parts = slug
+    .split("-")
+    .filter(Boolean)
+    .map((p) => p.replace(/[^a-zA-Z0-9]/g, ""));
+  if (parts.length === 0) return "solve";
+  return parts[0] + parts.slice(1).map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join("");
+}
+
+export const NEETCODE_PROBLEMS: Record<string, Problem[]> = Object.fromEntries(
+  Object.entries(RAW_NEETCODE_PROBLEMS).map(([patternSlug, problems]) => [
+    patternSlug,
+    problems.map((p) => {
+      const meta = PROVIDED_TESTS[p.slug] ?? {
+        functionName: slugToFunctionName(p.slug),
+        testCases: [],
+      };
+      return { ...p, ...meta };
+    }),
+  ]),
+) as Record<string, Problem[]>;
