@@ -24,17 +24,6 @@ function normalizeVariableType(type: string): string {
   return type;
 }
 
-function genericDescription(title: string) {
-  return `${title} asks you to design an efficient algorithm under interview constraints. Focus on identifying the right data-structure pattern, then optimize for time and space complexity. A clean implementation with edge-case handling is the goal.`;
-}
-
-function genericExample(problemSlug: string) {
-  return {
-    input: `Input for ${problemSlug}`,
-    output: `Expected output for ${problemSlug}`,
-  };
-}
-
 function patternHints(patternSlug: string): string[] {
   const map: Record<string, string[]> = {
     "arrays-hashing": [
@@ -254,7 +243,6 @@ export default function ProblemPage() {
     { key: "4x", mult: 4 },
   ] as const;
   const hints = problem ? patternHints(patternSlugResolved) : [];
-  const example = problem ? genericExample(problem.slug) : { input: "", output: "" };
   const totalSteps = trace?.total_steps ?? 0;
   const lastIndex = trace ? Math.max(0, trace.steps.length - 1) : 0;
   const stepLabel = trace && totalSteps > 0 ? `Step ${currentStep + 1} / ${totalSteps}` : "Step 0 / 0";
@@ -373,26 +361,40 @@ export default function ProblemPage() {
 
                   {tab === "description" ? (
                     <>
-                      <p className="text-sm text-muted leading-relaxed">{genericDescription(problem.title)}</p>
+                      <p className="text-sm text-muted leading-relaxed">{problem.description}</p>
                       <div className="mt-5">
                         <h3 className="text-white font-medium mb-2">Examples</h3>
                         <div className="space-y-3">
-                          <div className="bg-[#08080F] border border-border rounded-lg p-3">
-                            <div className="text-xs text-muted mb-1">Input</div>
-                            <pre className="text-sm text-white font-mono whitespace-pre-wrap">{example.input}</pre>
-                          </div>
-                          <div className="bg-[#08080F] border border-border rounded-lg p-3">
-                            <div className="text-xs text-muted mb-1">Output</div>
-                            <pre className="text-sm text-white font-mono whitespace-pre-wrap">{example.output}</pre>
-                          </div>
+                          {problem.examples.slice(0, 2).map((ex, idx) => (
+                            <div
+                              key={`${ex.input}-${idx}`}
+                              className="bg-[#08080F] border border-border rounded-lg p-3 space-y-3"
+                            >
+                              <div className="text-xs text-muted font-mono">Example {idx + 1}</div>
+
+                              <div>
+                                <div className="text-xs text-muted mb-1">Input</div>
+                                <pre className="text-sm text-white font-mono whitespace-pre-wrap">{ex.input}</pre>
+                              </div>
+
+                              <div>
+                                <div className="text-xs text-muted mb-1">Output</div>
+                                <pre className="text-sm text-white font-mono whitespace-pre-wrap">{ex.output}</pre>
+                              </div>
+
+                              {ex.explanation ? (
+                                <div className="text-sm text-muted leading-relaxed">{ex.explanation}</div>
+                              ) : null}
+                            </div>
+                          ))}
                         </div>
                       </div>
                       <div className="mt-5">
                         <h3 className="text-white font-medium mb-2">Constraints</h3>
                         <ul className="list-disc pl-5 text-sm text-muted space-y-1">
-                          <li>1 &lt;= n &lt;= 10^5</li>
-                          <li>Optimize for the expected pattern complexity.</li>
-                          <li>Handle edge cases and empty input safely.</li>
+                          {problem.constraints.map((c) => (
+                            <li key={c}>{c}</li>
+                          ))}
                         </ul>
                       </div>
                     </>
