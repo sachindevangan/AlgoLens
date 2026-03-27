@@ -275,6 +275,12 @@ export default function PlaygroundPage() {
     }
   };
 
+  useEffect(() => {
+    const handler = () => void onRun();
+    window.addEventListener("algolens:run", handler);
+    return () => window.removeEventListener("algolens:run", handler);
+  });
+
   const traceKey = trace ? `trace-${trace.total_steps}` : "trace-none";
 
   return (

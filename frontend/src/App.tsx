@@ -7,9 +7,11 @@ import PatternsPage from "./pages/patterns/PatternsPage";
 import PatternDetailPage from "./pages/patterns/PatternDetailPage";
 import NeetCodePage from "./pages/neetcode/NeetCodePage";
 import ProblemPage from "./pages/neetcode/ProblemPage";
+import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 
 export default function App() {
   const location = useLocation();
+  useKeyboardShortcuts();
 
   return (
     <AnimatePresence mode="wait" initial={false}>
