@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import textwrap
 from typing import Any
 
 from app.models import TestCase, TestCaseResult, TestRunResponse
@@ -20,34 +21,59 @@ def _try_parse_literal(s: str) -> Any:
 
 
 def outputs_match(actual: str, expected: str) -> bool:
-    a_norm = normalize_output(str(actual))
-    e_norm = normalize_output(expected)
-    if a_norm == e_norm:
+    a_str = normalize_output(str(actual))
+    e_str = normalize_output(expected)
+    if a_str == e_str:
         return True
-
-    # Float tolerance
     try:
-        a_f = float(actual)
-        e_f = float(expected)
-        return abs(a_f - e_f) <= 0.001
-    except Exception:
-        pass
+        a_parsed = ast.literal_eval(str(actual))
+        e_parsed = ast.literal_eval(expected)
 
-    # Try parsing as lists and sorting
-    try:
-        a_parsed = _try_parse_literal(str(actual))
-        e_parsed = _try_parse_literal(expected)
+        # Both are lists of lists — sort inner lists then sort outer list
+        # for order-independent comparison.
         if isinstance(a_parsed, list) and isinstance(e_parsed, list):
+            if all(isinstance(x, list) for x in a_parsed) and all(isinstance(x, list) for x in e_parsed):
+                a_sorted = sorted([sorted(str(i) for i in inner) for inner in a_parsed])
+                e_sorted = sorted([sorted(str(i) for i in inner) for inner in e_parsed])
+                return a_sorted == e_sorted
+            # Flat lists — sort and compare
             return sorted(str(x) for x in a_parsed) == sorted(str(x) for x in e_parsed)
+
+        # Float comparison
+        if isinstance(a_parsed, float) or isinstance(e_parsed, float):
+            return abs(float(str(actual)) - float(expected)) < 0.001
+
     except Exception:
         pass
-
     return False
 
 
 def run_tests(code: str, function_name: str, test_cases: list[TestCase]) -> TestRunResponse:
+    # Normalize indentation
+    code = textwrap.dedent(code)
+    # Remove any leading/trailing blank lines
+    code = code.strip()
     ns: dict[str, Any] = {}
-    exec(code, ns, ns)
+    try:
+        exec(code, ns, ns)
+    except IndentationError as e:
+        results = [
+            TestCaseResult(
+                case_number=i + 1,
+                args=tc.args,
+                expected=tc.expected,
+                actual="",
+                passed=False,
+                error=f"IndentationError: {str(e)}",
+            )
+            for i, tc in enumerate(test_cases)
+        ]
+        return TestRunResponse(
+            results=results,
+            passed=0,
+            total=len(test_cases),
+            all_passed=False,
+        )
 
     results: list[TestCaseResult] = []
     passed = 0
