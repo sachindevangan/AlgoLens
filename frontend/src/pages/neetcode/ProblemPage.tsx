@@ -1,6 +1,17 @@
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ChevronLeft, ChevronRight, Pause, Play, RotateCcw, SkipBack, SkipForward } from "lucide-react";
+import {
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  EyeOff,
+  Pause,
+  Play,
+  RotateCcw,
+  SkipBack,
+  SkipForward,
+} from "lucide-react";
 import React, { Component, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CodeEditor from "../../components/editor/CodeEditor";
@@ -105,11 +116,28 @@ class ProblemPageErrorBoundary extends Component<
 export default function ProblemPage() {
   const { problemSlug } = useParams<{ problemSlug: string }>();
   const navigate = useNavigate();
+
+  // One-time migration: clear all old solution drafts
+  const ONE_TIME_KEY = "algolens_drafts_cleared_v2";
+  if (typeof window !== "undefined" && !localStorage.getItem(ONE_TIME_KEY)) {
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith("draft-")) {
+        const val = localStorage.getItem(key);
+        if (val?.trim().startsWith("# Pattern:")) {
+          localStorage.removeItem(key);
+        }
+      }
+    });
+    localStorage.setItem(ONE_TIME_KEY, "1");
+  }
+
   const [tab, setTab] = useState<"description" | "hints">("description");
   const [showHint1, setShowHint1] = useState(false);
   const [showHint2, setShowHint2] = useState(false);
   const [showSolved, setShowSolved] = useState(false);
   const [isVisualizing, setIsVisualizing] = useState(false);
+  const [solutionRevealed, setSolutionRevealed] = useState(false);
+  const [showRevealConfirm, setShowRevealConfirm] = useState(false);
 
   const code = useTraceStore((s) => s.code);
   const trace = useTraceStore((s) => s.trace);
@@ -141,12 +169,31 @@ export default function ProblemPage() {
     problems.some((p) => p.slug === problemSlug),
   );
   const patternSlugResolved = patternEntry?.[0] ?? "";
+  const patternSlug = patternSlugResolved;
   const patternProblems = patternEntry?.[1] ?? [];
   const problemIndex = patternProblems.findIndex((p) => p.slug === problemSlug);
 
   // Get solution (fallback to placeholder)
-  const solution =
-    SOLUTIONS[problemSlug ?? ""] ?? "# Solution coming soon\npass";
+  const solution = SOLUTIONS[problemSlug ?? ""];
+  // eslint-disable-next-line no-console
+  console.log("[Solution]", {
+    problemSlug,
+    hasSolution: !!SOLUTIONS[problemSlug ?? ""],
+    solutionPreview: SOLUTIONS[problemSlug ?? ""]?.slice(0, 50),
+  });
+  // eslint-disable-next-line no-console
+  console.log(Object.keys(SOLUTIONS).slice(0, 10));
+  if (
+    !solution ||
+    solution.includes("coming soon") ||
+    solution.includes("Template solution")
+  ) {
+    // eslint-disable-next-line no-console
+    console.warn("[Solution] Missing/placeholder solution", {
+      problemSlug,
+      solutionPreview: solution?.slice(0, 80),
+    });
+  }
 
   // Resolve pattern (for badges/UI)
   const pattern = PATTERNS.find((p) => p.slug === patternSlugResolved) ?? null;
@@ -178,23 +225,32 @@ export default function ProblemPage() {
 
   useEffect(() => {
     if (!problemSlug) return;
+    // eslint-disable-next-line no-console
+    console.log("Loading starter for:", problemSlug);
+    setSolutionRevealed(false);
     reset();
-    setIsVisualizing(false);
-    setTab("description");
-    setShowHint1(false);
-    setShowHint2(false);
-    const s = SOLUTIONS[problemSlug ?? ""] ?? "# coming soon\npass";
-    const draft = storage.getDraft(problemSlug);
-    setCode(draft ?? s ?? "");
+    // Clear old solution drafts — if saved code looks like a solution (starts with "# Pattern:"), don't load it
+    const existingDraft = storage.getDraft(problemSlug ?? "");
+    const safeDraft =
+      existingDraft && !existingDraft.trim().startsWith("# Pattern:")
+        ? existingDraft
+        : null;
+    const patternDisplay = patternSlug
+      .split("-")
+      .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+    const starter = `# ${problem?.title ?? problemSlug}\n# Pattern: ${patternDisplay}\n# Write your solution below\n\ndef solution():\n    pass\n\nprint(solution())`;
+    setCode(safeDraft ?? starter);
   }, [problemSlug]);
 
   useEffect(() => {
-    if (!problemSlug || !code) return
+    if (!problemSlug || !code) return;
+    if (solutionRevealed && code === solution) return;
     const timer = setTimeout(() => {
-      storage.saveDraft(problemSlug, code)
-    }, 1000)
-    return () => clearTimeout(timer)
-  }, [code, problemSlug])
+      storage.saveDraft(problemSlug, code);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [code, problemSlug, solutionRevealed, solution]);
 
   const runCode = async () => {
     if (!problem) return;
@@ -440,11 +496,42 @@ export default function ProblemPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setCode(solution ?? "")}
+                      onClick={() => {
+                        const draft = problemSlug ? storage.getDraft(problemSlug) : null;
+                        const patternDisplay = patternSlug
+                          .split("-")
+                          .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+                          .join(" ");
+                        const starter = `# ${problem?.title ?? problemSlug ?? ""}\n# Pattern: ${patternDisplay}\n# Write your solution below\n\ndef solution():\n    pass\n\nprint(solution())`;
+                        setCode(draft ?? starter);
+                      }}
                       className="h-9 px-3 rounded-md border border-[#1E1E2E] text-muted inline-flex items-center gap-2 hover:text-white"
                     >
                       <RotateCcw size={14} />
                       Reset
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!problemSlug) return;
+                        if (!solutionRevealed) {
+                          setShowRevealConfirm(true);
+                          return;
+                        }
+                        const draft = storage.getDraft(problemSlug);
+                        setSolutionRevealed(false);
+                        setShowRevealConfirm(false);
+                        const patternDisplay = patternSlug
+                          .split("-")
+                          .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+                          .join(" ");
+                        const starter = `# ${problem?.title ?? problemSlug}\n# Pattern: ${patternDisplay}\n# Write your solution below\n\ndef solution():\n    pass\n\nprint(solution())`;
+                        setCode(draft ?? starter);
+                      }}
+                      className="h-9 px-3 rounded-md border border-[#1E1E2E] text-muted inline-flex items-center gap-2 hover:text-white"
+                    >
+                      {solutionRevealed ? <EyeOff size={14} /> : <Eye size={14} />}
+                      {solutionRevealed ? "Hide Solution" : "Show Solution"}
                     </button>
                   </div>
                   <div className="flex-1 min-h-0">
@@ -603,6 +690,56 @@ export default function ProblemPage() {
                 className="fixed right-6 bottom-6 bg-[#10B981] text-white px-3 py-2 rounded-full font-medium shadow-lg"
               >
                 ✓ Solved!
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {showRevealConfirm ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center"
+              >
+                <button
+                  type="button"
+                  aria-label="Close reveal solution confirmation"
+                  onClick={() => setShowRevealConfirm(false)}
+                  className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+                />
+                <motion.div
+                  initial={{ y: 8, scale: 0.98, opacity: 0 }}
+                  animate={{ y: 0, scale: 1, opacity: 1 }}
+                  exit={{ y: 8, scale: 0.98, opacity: 0 }}
+                  transition={{ duration: 0.15, ease: "easeOut" }}
+                  className="relative w-[420px] max-w-[calc(100vw-32px)] rounded-xl border border-border bg-surface p-6 shadow-xl"
+                >
+                  <div className="text-white font-semibold">Reveal solution?</div>
+                  <div className="mt-2 text-sm text-amber-400">
+                    Are you sure? This will reveal the optimal solution.
+                  </div>
+                  <div className="mt-5 grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSolutionRevealed(true);
+                        setShowRevealConfirm(false);
+                        setCode(solution ?? "# Solution coming soon\npass");
+                      }}
+                      className="h-9 rounded-md bg-primary text-white"
+                    >
+                      Yes, show me
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowRevealConfirm(false)}
+                      className="h-9 rounded-md border border-border text-muted hover:text-white"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </motion.div>
               </motion.div>
             ) : null}
           </AnimatePresence>

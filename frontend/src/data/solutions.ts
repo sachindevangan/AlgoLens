@@ -111,7 +111,7 @@ def topKFrequent(nums: list[int], k: int) -> list[int]:
 print(topKFrequent([1,1,1,2,2,3], 2))
 `,
 
-  "encode-decode-strings": `# Pattern: Arrays & Hashing
+  "encode-and-decode-strings": `# Pattern: Arrays & Hashing
 def encode(strs: list[str]) -> str:
     return "".join(f"{len(s)}#{s}" for s in strs)
 
@@ -128,7 +128,7 @@ def decode(s: str) -> list[str]:
 print(decode(encode(["hello","world"])))
 `,
 
-  "product-array-except-self": `# Pattern: Arrays & Hashing
+  "product-of-array-except-self": `# Pattern: Arrays & Hashing
 def productExceptSelf(nums: list[int]) -> list[int]:
     n = len(nums)
     result: list[int] = [1] * n
@@ -209,7 +209,7 @@ def isPalindrome(s: str) -> bool:
 print(isPalindrome("A man, a plan, a canal: Panama"))
 `,
 
-  "two-sum-ii": `# Pattern: Two Pointers
+  "two-sum-ii-input-array-is-sorted": `# Pattern: Two Pointers
 def twoSumII(numbers: list[int], target: int) -> list[int]:
     left, right = 0, len(numbers) - 1
     while left < right:
@@ -293,7 +293,7 @@ print(trap([0,1,0,2,1,0,1,3,2,1,2,1]))
 `,
 
   // SLIDING WINDOW
-  "best-time-to-buy-sell-stock": `# Pattern: Sliding Window
+  "best-time-to-buy-and-sell-stock": `# Pattern: Sliding Window
 def maxProfit(prices: list[int]) -> int:
     min_price = float("inf")
     max_profit = 0
@@ -305,7 +305,7 @@ def maxProfit(prices: list[int]) -> int:
 print(maxProfit([7,1,5,3,6,4]))
 `,
 
-  "longest-substring-without-repeating": `# Pattern: Sliding Window
+  "longest-substring-without-repeating-characters": `# Pattern: Sliding Window
 def lengthOfLongestSubstring(s: str) -> int:
     seen: set[str] = set()
     left = 0
@@ -516,7 +516,7 @@ def carFleet(target: int, position: list[int], speed: list[int]) -> int:
 print(carFleet(12, [10,8,0,5,3], [2,4,1,1,3]))
 `,
 
-  "largest-rectangle-histogram": `# Pattern: Stack
+  "largest-rectangle-in-histogram": `# Pattern: Stack
 def largestRectangleArea(heights: list[int]) -> int:
     stack: list[tuple[int, int]] = []  # (start_index, height)
     max_area = 0
@@ -551,7 +551,7 @@ def search(nums: list[int], target: int) -> int:
 print(search([-1,0,3,5,9,12], 9))
 `,
 
-  "search-2d-matrix": `# Pattern: Binary Search
+  "search-a-2d-matrix": `# Pattern: Binary Search
 def searchMatrix(matrix: list[list[int]], target: int) -> bool:
     rows = len(matrix)
     cols = len(matrix[0]) if matrix else 0
@@ -588,7 +588,7 @@ def minEatingSpeed(piles: list[int], h: int) -> int:
 print(minEatingSpeed([3,6,7,11], 8))
 `,
 
-  "find-minimum-rotated-sorted-array": `# Pattern: Binary Search
+  "find-minimum-in-rotated-sorted-array": `# Pattern: Binary Search
 def findMin(nums: list[int]) -> int:
     lo, hi = 0, len(nums) - 1
     while lo < hi:
@@ -602,7 +602,7 @@ def findMin(nums: list[int]) -> int:
 print(findMin([3,4,5,1,2]))
 `,
 
-  "search-rotated-sorted-array": `# Pattern: Binary Search
+  "search-in-rotated-sorted-array": `# Pattern: Binary Search
 def searchRotated(nums: list[int], target: int) -> int:
     lo, hi = 0, len(nums) - 1
     while lo <= hi:
@@ -647,7 +647,7 @@ tm.set("foo", "bar", 1)
 print(tm.get("foo", 1))
 `,
 
-  "median-two-sorted-arrays": `# Pattern: Binary Search
+  "median-of-two-sorted-arrays": `# Pattern: Binary Search
 def findMedianSortedArrays(nums1: list[int], nums2: list[int]) -> float:
     if len(nums1) > len(nums2):
         nums1, nums2 = nums2, nums1
@@ -842,7 +842,7 @@ reorderList(h)
 print(to_list(h))
 `;
 
-SOLUTIONS["remove-nth-node-end"] = `# Pattern: Linked List
+SOLUTIONS["remove-nth-node-from-end-of-list"] = `# Pattern: Linked List
 from typing import Optional
 
 
@@ -892,7 +892,7 @@ def to_list(head: Optional[ListNode]) -> list[int]:
 print(to_list(removeNthFromEnd(build([1, 2, 3, 4, 5]), 2)))
 `;
 
-SOLUTIONS["copy-list-random-pointer"] = `# Pattern: Linked List
+SOLUTIONS["copy-list-with-random-pointer"] = `# Pattern: Linked List
 from typing import Optional
 
 
@@ -1068,7 +1068,7 @@ lists = [build([1, 4, 5]), build([1, 3, 4]), build([2, 6])]
 print(to_list(mergeKLists(lists)))
 `;
 
-SOLUTIONS["reverse-nodes-k-group"] = `# Pattern: Linked List
+SOLUTIONS["reverse-nodes-in-k-group"] = `# Pattern: Linked List
 from typing import Optional
 
 
@@ -1165,7 +1165,7 @@ def build_cycle(vals: list[int], pos: int) -> Optional[ListNode]:
 print(hasCycle(build_cycle([3, 2, 0, -4], 1)))
 `;
 
-SOLUTIONS["find-duplicate-number"] = `# Pattern: Linked List
+SOLUTIONS["find-the-duplicate-number"] = `# Pattern: Linked List
 from typing import List
 
 
@@ -1431,7 +1431,7 @@ def partition(s: str) -> list[list[str]]:
 print(partition("aab"))
 `;
 
-SOLUTIONS["letter-combinations-phone"] = `# Pattern: Backtracking
+SOLUTIONS["letter-combinations-of-a-phone-number"] = `# Pattern: Backtracking
 from typing import List
 
 
@@ -1496,7 +1496,7 @@ def solveNQueens(n: int) -> list[list[str]]:
 print(solveNQueens(4))
 `;
 
-SOLUTIONS["implement-trie"] = `# Pattern: Tries
+SOLUTIONS["implement-trie-prefix-tree"] = `# Pattern: Tries
 from typing import Dict
 
 
@@ -1540,7 +1540,7 @@ trie.insert("apple")
 print(trie.search("apple"), trie.search("app"), trie.startsWith("app"))
 `;
 
-SOLUTIONS["design-add-search-words"] = `# Pattern: Tries
+SOLUTIONS["design-add-and-search-words-data-structure"] = `# Pattern: Tries
 from typing import Dict
 
 
@@ -1716,7 +1716,7 @@ cloned = cloneGraph(n1)
 print((cloned.val, sorted([x.val for x in cloned.neighbors])))
 `;
 
-SOLUTIONS["max-area-island"] = `# Pattern: Graphs
+SOLUTIONS["max-area-of-island"] = `# Pattern: Graphs
 from typing import List
 
 
@@ -2011,7 +2011,7 @@ def findRedundantConnection(edges: list[list[int]]) -> list[int]:
 print(findRedundantConnection([[1,2],[1,3],[2,3]]))
 `;
 
-SOLUTIONS["number-connected-components"] = `# Pattern: Graphs
+SOLUTIONS["number-of-connected-components-in-an-undirected-graph"] = `# Pattern: Graphs
 from typing import List
 
 
@@ -2145,7 +2145,7 @@ def findItinerary(tickets: list[list[str]]) -> list[str]:
 print(findItinerary([["MUC","LHR"],["JFK","MUC"],["SFO","SJC"],["LHR","SFO"]]))
 `;
 
-SOLUTIONS["min-cost-connect-points"] = `# Pattern: Advanced Graphs
+SOLUTIONS["min-cost-to-connect-all-points"] = `# Pattern: Advanced Graphs
 from typing import List
 import heapq
 
@@ -2210,7 +2210,7 @@ def networkDelayTime(times: list[list[int]], n: int, k: int) -> int:
 print(networkDelayTime([[2,1,1],[2,3,1],[3,4,1]], 4, 2))
 `;
 
-SOLUTIONS["swim-rising-water"] = `# Pattern: Advanced Graphs
+SOLUTIONS["swim-in-rising-water"] = `# Pattern: Advanced Graphs
 from typing import List
 import heapq
 
@@ -2284,7 +2284,7 @@ def alienOrder(words: list[str]) -> str:
 print(alienOrder(["wrt","wrf","er","ett","rftt"]))
 `;
 
-SOLUTIONS["cheapest-flights-k-stops"] = `# Pattern: Advanced Graphs
+SOLUTIONS["cheapest-flights-within-k-stops"] = `# Pattern: Advanced Graphs
 from typing import List
 
 
@@ -2343,7 +2343,7 @@ inverted = invertTree(root)
 print(preorder(inverted))
 `;
 
-SOLUTIONS["maximum-depth-binary-tree"] = `# Pattern: Trees
+SOLUTIONS["maximum-depth-of-binary-tree"] = `# Pattern: Trees
 from typing import Optional
 
 
@@ -2369,7 +2369,7 @@ root = TreeNode(3, TreeNode(9), TreeNode(20, TreeNode(15), TreeNode(7)))
 print(maxDepth(root))
 `;
 
-SOLUTIONS["diameter-binary-tree"] = `# Pattern: Trees
+SOLUTIONS["diameter-of-binary-tree"] = `# Pattern: Trees
 from typing import Optional
 
 
@@ -2471,7 +2471,7 @@ q = TreeNode(1, TreeNode(2), TreeNode(3))
 print(isSameTree(p, q))
 `;
 
-SOLUTIONS["subtree-another-tree"] = `# Pattern: Trees
+SOLUTIONS["subtree-of-another-tree"] = `# Pattern: Trees
 from typing import Optional
 
 
@@ -2510,7 +2510,7 @@ sub = TreeNode(4, TreeNode(1), TreeNode(2))
 print(isSubtree(root, sub))
 `;
 
-SOLUTIONS["lowest-common-ancestor-bst"] = `# Pattern: Trees
+SOLUTIONS["lowest-common-ancestor-of-a-binary-search-tree"] = `# Pattern: Trees
 from typing import Optional
 
 
@@ -2550,7 +2550,7 @@ q = root.left.right.right # 5
 print(lowestCommonAncestor(root, p, q).val)
 `;
 
-SOLUTIONS["binary-tree-level-order"] = `# Pattern: Trees
+SOLUTIONS["binary-tree-level-order-traversal"] = `# Pattern: Trees
 from typing import Optional, List
 from collections import deque
 
@@ -2627,7 +2627,7 @@ root = TreeNode(1, TreeNode(2, None, TreeNode(5)), TreeNode(3, None, None))
 print(rightSideView(root))
 `;
 
-SOLUTIONS["count-good-nodes"] = `# Pattern: Trees
+SOLUTIONS["count-good-nodes-in-binary-tree"] = `# Pattern: Trees
 from typing import Optional
 
 
@@ -2658,7 +2658,7 @@ root = TreeNode(3, TreeNode(1, TreeNode(3), None), TreeNode(4, TreeNode(1), Tree
 print(goodNodes(root))
 `;
 
-SOLUTIONS["validate-bst"] = `# Pattern: Trees
+SOLUTIONS["validate-binary-search-tree"] = `# Pattern: Trees
 from typing import Optional
 
 
@@ -2689,7 +2689,7 @@ root = TreeNode(2, TreeNode(1), TreeNode(3))
 print(isValidBST(root))
 `;
 
-SOLUTIONS["kth-smallest-bst"] = `# Pattern: Trees
+SOLUTIONS["kth-smallest-element-in-a-bst"] = `# Pattern: Trees
 from typing import Optional
 
 
@@ -2724,7 +2724,7 @@ root = TreeNode(3, TreeNode(1, None, TreeNode(2)), TreeNode(4))
 print(kthSmallest(root, 1), kthSmallest(root, 3))
 `;
 
-SOLUTIONS["construct-binary-tree"] = `# Pattern: Trees
+SOLUTIONS["construct-binary-tree-from-preorder-and-inorder-traversal"] = `# Pattern: Trees
 from typing import Optional, List, Dict
 
 
@@ -2764,7 +2764,7 @@ root = buildTree([3, 9, 20, 15, 7], [9, 3, 15, 20, 7])
 print(preorder_vals(root))
 `;
 
-SOLUTIONS["binary-tree-max-path-sum"] = `# Pattern: Trees
+SOLUTIONS["binary-tree-maximum-path-sum"] = `# Pattern: Trees
 from typing import Optional
 
 
@@ -2800,7 +2800,7 @@ root = TreeNode(-10, TreeNode(9), TreeNode(20, TreeNode(15), TreeNode(7)))
 print(maxPathSum(root))
 `;
 
-SOLUTIONS["serialize-deserialize-binary-tree"] = `# Pattern: Trees
+SOLUTIONS["serialize-and-deserialize-binary-tree"] = `# Pattern: Trees
 from typing import Optional, List
 from collections import deque
 
@@ -2892,7 +2892,7 @@ def leastInterval(tasks: list[str], n: int) -> int:
 print(leastInterval(["A","A","A","B","B","B"], 2))
 `;
 
-SOLUTIONS["kth-largest-stream"] = `# Pattern: Heap / Priority Queue
+SOLUTIONS["kth-largest-element-in-a-stream"] = `# Pattern: Heap / Priority Queue
 from typing import List
 import heapq
 
@@ -2934,7 +2934,7 @@ def lastStoneWeight(stones: list[int]) -> int:
 print(lastStoneWeight([2,7,4,1,8,1]))
 `;
 
-SOLUTIONS["k-closest-points-origin"] = `# Pattern: Heap / Priority Queue
+SOLUTIONS["k-closest-points-to-origin"] = `# Pattern: Heap / Priority Queue
 from typing import List
 import heapq
 
@@ -2961,7 +2961,7 @@ def kClosest(points: list[list[int]], k: int) -> list[list[int]]:
 print(kClosest([[1,3],[-2,2]], 1))
 `;
 
-SOLUTIONS["kth-largest-array"] = `# Pattern: Heap / Priority Queue
+SOLUTIONS["kth-largest-element-in-an-array"] = `# Pattern: Heap / Priority Queue
 from typing import List
 import heapq
 
@@ -3036,7 +3036,7 @@ tw.unfollow(1, 2)
 print(tw.getNewsFeed(1))
 `;
 
-SOLUTIONS["find-median-data-stream"] = `# Pattern: Heap / Priority Queue
+SOLUTIONS["find-median-from-data-stream"] = `# Pattern: Heap / Priority Queue
 from typing import List
 import heapq
 
@@ -3338,7 +3338,7 @@ def longestCommonSubsequence(text1: str, text2: str) -> int:
 print(longestCommonSubsequence("abcde", "ace"))
 `;
 
-SOLUTIONS["buy-sell-stock-cooldown"] = `# Pattern: 2D Dynamic Programming
+SOLUTIONS["best-time-to-buy-and-sell-stock-with-cooldown"] = `# Pattern: 2D Dynamic Programming
 from typing import List
 
 
@@ -3424,7 +3424,7 @@ print(isInterleave("aabcc", "dbbca", "aadbbcbcac"))
 print(isInterleave("aabcc", "dbbca", "aadbbbaccc"))
 `;
 
-SOLUTIONS["longest-increasing-path-matrix"] = `# Pattern: 2D Dynamic Programming
+SOLUTIONS["longest-increasing-path-in-a-matrix"] = `# Pattern: 2D Dynamic Programming
 from typing import List
 
 
@@ -3629,7 +3629,7 @@ def isNStraightHand(hand: list[int], groupSize: int) -> bool:
 print(isNStraightHand([1,2,3,4,5], 4))
 `;
 
-SOLUTIONS["merge-triplets-target"] = `# Pattern: Greedy
+SOLUTIONS["merge-triplets-to-form-target-triplet"] = `# Pattern: Greedy
 from typing import List
 
 
@@ -3790,7 +3790,7 @@ def minMeetingRooms(intervals: list[list[int]]) -> int:
 print(minMeetingRooms([[0,30],[5,10],[15,20]]))
 `;
 
-SOLUTIONS["minimum-interval-query"] = `# Pattern: Intervals
+SOLUTIONS["minimum-interval-to-include-each-query"] = `# Pattern: Intervals
 from typing import List
 import heapq
 
@@ -3939,7 +3939,7 @@ def plusOne(digits: list[int]) -> list[int]:
 print(plusOne([1,2,3]))
 `;
 
-SOLUTIONS["pow-x-n"] = `# Pattern: Math & Geometry
+SOLUTIONS["powx-n"] = `# Pattern: Math & Geometry
 def myPow(x: float, n: int) -> float:
     if n == 0:
         return 1.0
