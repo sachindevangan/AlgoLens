@@ -142,7 +142,9 @@ export default function ProblemPage() {
     Object.keys(localStorage).forEach((key) => {
       if (key.startsWith("draft-")) {
         const val = localStorage.getItem(key);
-        if (val?.trim().startsWith("# Pattern:")) {
+        const isOldTemplate =
+          val?.trim().startsWith("# ") && val.includes("def solution():");
+        if (isOldTemplate) {
           localStorage.removeItem(key);
         }
       }
@@ -159,6 +161,7 @@ export default function ProblemPage() {
   const [showRevealConfirm, setShowRevealConfirm] = useState(false);
   const [testResults, setTestResults] = useState<TestRunResponse | null>(null);
   const [isRunningTests, setIsRunningTests] = useState(false);
+  const [noTestsMessage, setNoTestsMessage] = useState<string | null>(null);
 
   const code = useTraceStore((s) => s.code);
   const trace = useTraceStore((s) => s.trace);
@@ -190,7 +193,6 @@ export default function ProblemPage() {
     problems.some((p) => p.slug === problemSlug),
   );
   const patternSlugResolved = patternEntry?.[0] ?? "";
-  const patternSlug = patternSlugResolved;
   const patternProblems = patternEntry?.[1] ?? [];
   const problemIndex = patternProblems.findIndex((p) => p.slug === problemSlug);
 
@@ -250,18 +252,14 @@ export default function ProblemPage() {
     console.log("Loading starter for:", problemSlug);
     setSolutionRevealed(false);
     setTestResults(null);
+    setNoTestsMessage(null);
     reset();
-    // Clear old solution drafts — if saved code looks like a solution (starts with "# Pattern:"), don't load it
     const existingDraft = storage.getDraft(problemSlug ?? "");
-    const safeDraft =
-      existingDraft && !existingDraft.trim().startsWith("# Pattern:")
-        ? existingDraft
-        : null;
-    const patternDisplay = patternSlug
-      .split("-")
-      .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(" ");
-    const starter = `# ${problem?.title ?? problemSlug}\n# Pattern: ${patternDisplay}\n# Write your solution below\n\ndef solution():\n    pass\n\nprint(solution())`;
+    const starter = problem?.starterCode ?? "class Solution:\n    pass\n";
+    const isOldTemplate =
+      existingDraft?.trim().startsWith("# ") &&
+      existingDraft?.includes("def solution():");
+    const safeDraft = existingDraft && !isOldTemplate ? existingDraft : null;
     setCode(safeDraft ?? starter);
   }, [problemSlug]);
 
@@ -310,8 +308,14 @@ export default function ProblemPage() {
 
   const runTests = async () => {
     if (!problem) return;
-    if (!problem.functionName || !problem.testCases) return;
+    if (!problem.functionName) return;
+    if (!problem.testCases || problem.testCases.length === 0) {
+      setNoTestsMessage("No automated tests available for this problem. Use Run & Visualize to test your solution.");
+      setTestResults(null);
+      return;
+    }
     setIsRunningTests(true);
+    setNoTestsMessage(null);
     try {
       const response = await axios.post<TestRunResponse>("http://localhost:8000/run-tests", {
         code: useTraceStore.getState().code,
@@ -473,6 +477,17 @@ export default function ProblemPage() {
                     <>
                       <p className="text-sm text-muted leading-relaxed">{problem.description}</p>
                       <AnimatePresence>
+                        {noTestsMessage ? (
+                          <motion.div
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 8 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                            className="mt-5 rounded-xl border border-border bg-surface p-4 text-sm text-muted"
+                          >
+                            {noTestsMessage}
+                          </motion.div>
+                        ) : null}
                         {testResults ? (
                           <motion.div
                             initial={{ opacity: 0, y: 8 }}
@@ -628,7 +643,7 @@ export default function ProblemPage() {
                     <button
                       type="button"
                       onClick={() => void runTests()}
-                      disabled={isRunningTests || !problem.functionName || !problem.testCases?.length}
+                      disabled={isRunningTests || !problem.functionName}
                       className="h-9 px-3 rounded-md border border-[#1E1E2E] text-muted inline-flex items-center gap-2 hover:border-[#10B98155] hover:text-[#10B981] disabled:opacity-40"
                     >
                       <FlaskConical size={14} />
@@ -638,11 +653,7 @@ export default function ProblemPage() {
                       type="button"
                       onClick={() => {
                         const draft = problemSlug ? storage.getDraft(problemSlug) : null;
-                        const patternDisplay = patternSlug
-                          .split("-")
-                          .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-                          .join(" ");
-                        const starter = `# ${problem?.title ?? problemSlug ?? ""}\n# Pattern: ${patternDisplay}\n# Write your solution below\n\ndef solution():\n    pass\n\nprint(solution())`;
+                        const starter = problem?.starterCode ?? "class Solution:\n    pass\n";
                         setCode(draft ?? starter);
                       }}
                       className="h-9 px-3 rounded-md border border-[#1E1E2E] text-muted inline-flex items-center gap-2 hover:text-white"
@@ -661,11 +672,7 @@ export default function ProblemPage() {
                         const draft = storage.getDraft(problemSlug);
                         setSolutionRevealed(false);
                         setShowRevealConfirm(false);
-                        const patternDisplay = patternSlug
-                          .split("-")
-                          .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-                          .join(" ");
-                        const starter = `# ${problem?.title ?? problemSlug}\n# Pattern: ${patternDisplay}\n# Write your solution below\n\ndef solution():\n    pass\n\nprint(solution())`;
+                        const starter = problem?.starterCode ?? "class Solution:\n    pass\n";
                         setCode(draft ?? starter);
                       }}
                       className="h-9 px-3 rounded-md border border-[#1E1E2E] text-muted inline-flex items-center gap-2 hover:text-white"

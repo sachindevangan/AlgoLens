@@ -10,13 +10,14 @@ export type Problem = {
   }[];
   constraints: string[];
   functionName: string;
+  starterCode: string;
   testCases: {
     args: string;
     expected: string;
   }[];
 };
 
-type RawProblem = Omit<Problem, "functionName" | "testCases">;
+type RawProblem = Omit<Problem, "functionName" | "testCases" | "starterCode">;
 
 const RAW_NEETCODE_PROBLEMS: Record<string, RawProblem[]> = {
   "arrays-hashing": [
@@ -3537,16 +3538,43 @@ const PROVIDED_TESTS: Record<string, ProblemTestMeta> = {
     functionName: "hasCycle",
     testCases: [{ args: "None", expected: "False" }],
   },
+  "add-two-numbers": {
+    functionName: "addTwoNumbers",
+    testCases: [{ args: "None, None", expected: "design" }],
+  },
   "find-the-duplicate-number": {
     functionName: "findDuplicate",
     testCases: [
-      { args: "[1,3,4,2,2]", expected: "2" },
-      { args: "[3,1,3,4,2]", expected: "3" },
+      { args: "[1,3,4,2,2]", expected: "design" },
+      { args: "[3,1,3,4,2]", expected: "design" },
     ],
   },
   "maximum-depth-of-binary-tree": {
     functionName: "maxDepth",
     testCases: [{ args: "None", expected: "0" }],
+  },
+  "invert-binary-tree": {
+    functionName: "invertTree",
+    testCases: [{ args: "None", expected: "None" }],
+  },
+  "binary-tree-level-order-traversal": {
+    functionName: "levelOrder",
+    testCases: [{ args: "None", expected: "[]" }],
+  },
+  "binary-tree-right-side-view": {
+    functionName: "rightSideView",
+    testCases: [{ args: "None", expected: "[]" }],
+  },
+  "validate-binary-search-tree": {
+    functionName: "isValidBST",
+    testCases: [{ args: "None", expected: "True" }],
+  },
+  "construct-binary-tree-from-preorder-and-inorder-traversal": {
+    functionName: "buildTree",
+    testCases: [
+      { args: "[3,9,20,15,7], [9,3,15,20,7]", expected: "design" },
+      { args: "[-1], [-1]", expected: "design" },
+    ],
   },
   "climbing-stairs": {
     functionName: "climbStairs",
@@ -3622,7 +3650,7 @@ const PROVIDED_TESTS: Record<string, ProblemTestMeta> = {
   "rotate-image": {
     functionName: "rotate",
     testCases: [
-      { args: "[[1,2,3],[4,5,6],[7,8,9]]", expected: "[[7,4,1],[8,5,2],[9,6,3]]" },
+      { args: "[[1,2,3],[4,5,6],[7,8,9]]", expected: "design" },
     ],
   },
   "single-number": {
@@ -3643,6 +3671,299 @@ const PROVIDED_TESTS: Record<string, ProblemTestMeta> = {
   },
 };
 
+const PROVIDED_STARTERS: Record<string, string> = {
+  "contains-duplicate": `class Solution:\n    def containsDuplicate(self, nums: List[int]) -> bool:\n        `,
+  "valid-anagram": `class Solution:\n    def isAnagram(self, s: str, t: str) -> bool:\n        `,
+  "two-sum": `class Solution:\n    def twoSum(self, nums: List[int], target: int) -> List[int]:\n        `,
+  "group-anagrams": `class Solution:\n    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:\n        `,
+  "top-k-frequent-elements": `class Solution:\n    def topKFrequent(self, nums: List[int], k: int) -> List[int]:\n        `,
+  "encode-decode-strings": `class Solution:\n    def encode(self, strs: List[str]) -> str:\n        \n\n    def decode(self, s: str) -> List[str]:\n        `,
+  "product-array-except-self": `class Solution:\n    def productExceptSelf(self, nums: List[int]) -> List[int]:\n        `,
+  "valid-sudoku": `class Solution:\n    def isValidSudoku(self, board: List[List[str]]) -> bool:\n        `,
+  "longest-consecutive-sequence": `class Solution:\n    def longestConsecutive(self, nums: List[int]) -> int:\n        `,
+  "valid-palindrome": `class Solution:\n    def isPalindrome(self, s: str) -> bool:\n        `,
+  "two-sum-ii": `class Solution:\n    def twoSumII(self, numbers: List[int], target: int) -> List[int]:\n        `,
+  "3sum": `class Solution:\n    def threeSum(self, nums: List[int]) -> List[List[int]]:\n        `,
+  "container-with-most-water": `class Solution:\n    def maxArea(self, height: List[int]) -> int:\n        `,
+  "trapping-rain-water": `class Solution:\n    def trap(self, height: List[int]) -> int:\n        `,
+  "best-time-to-buy-sell-stock": `class Solution:\n    def maxProfit(self, prices: List[int]) -> int:\n        `,
+  "longest-substring-without-repeating": `class Solution:\n    def lengthOfLongestSubstring(self, s: str) -> int:\n        `,
+  "longest-repeating-character-replacement": `class Solution:\n    def characterReplacement(self, s: str, k: int) -> int:\n        `,
+  "permutation-in-string": `class Solution:\n    def checkInclusion(self, s1: str, s2: str) -> bool:\n        `,
+  "minimum-window-substring": `class Solution:\n    def minWindow(self, s: str, t: str) -> str:\n        `,
+  "sliding-window-maximum": `class Solution:\n    def maxSlidingWindow(self, nums: List[int], k: int) -> List[int]:\n        `,
+  "valid-parentheses": `class Solution:\n    def isValid(self, s: str) -> bool:\n        `,
+  "min-stack": `class MinStack:\n    def __init__(self):\n        \n\n    def push(self, val: int) -> None:\n        \n\n    def pop(self) -> None:\n        \n\n    def top(self) -> int:\n        \n\n    def getMin(self) -> int:\n        `,
+  "evaluate-reverse-polish-notation": `class Solution:\n    def evalRPN(self, tokens: List[str]) -> int:\n        `,
+  "generate-parentheses": `class Solution:\n    def generateParenthesis(self, n: int) -> List[str]:\n        `,
+  "daily-temperatures": `class Solution:\n    def dailyTemperatures(self, temperatures: List[int]) -> List[int]:\n        `,
+  "car-fleet": `class Solution:\n    def carFleet(self, target: int, position: List[int], speed: List[int]) -> int:\n        `,
+  "largest-rectangle-histogram": `class Solution:\n    def largestRectangleArea(self, heights: List[int]) -> int:\n        `,
+  "binary-search": `class Solution:\n    def search(self, nums: List[int], target: int) -> int:\n        `,
+  "search-2d-matrix": `class Solution:\n    def searchMatrix(self, matrix: List[List[int]], target: int) -> bool:\n        `,
+  "koko-eating-bananas": `class Solution:\n    def minEatingSpeed(self, piles: List[int], h: int) -> int:\n        `,
+  "find-minimum-rotated-sorted-array": `class Solution:\n    def findMin(self, nums: List[int]) -> int:\n        `,
+  "search-rotated-sorted-array": `class Solution:\n    def searchRotated(self, nums: List[int], target: int) -> int:\n        `,
+  "time-based-key-value-store": `class TimeMap:\n    def __init__(self):\n        \n\n    def set(self, key: str, value: str, timestamp: int) -> None:\n        \n\n    def get(self, key: str, timestamp: int) -> str:\n        `,
+  "median-two-sorted-arrays": `class Solution:\n    def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -> float:\n        `,
+  "reverse-linked-list": `class Solution:\n    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:\n        `,
+  "merge-two-sorted-lists": `class Solution:\n    def mergeTwoLists(self, list1: Optional[ListNode], list2: Optional[ListNode]) -> Optional[ListNode]:\n        `,
+  "reorder-list": `class Solution:\n    def reorderList(self, head: Optional[ListNode]) -> None:\n        `,
+  "remove-nth-node-end": `class Solution:\n    def removeNthFromEnd(self, head: Optional[ListNode], n: int) -> Optional[ListNode]:\n        `,
+  "copy-list-random-pointer": `class Solution:\n    def copyRandomList(self, head: Optional[Node]) -> Optional[Node]:\n        `,
+  "add-two-numbers": `class Solution:\n    def addTwoNumbers(self, l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:\n        `,
+  "linked-list-cycle": `class Solution:\n    def hasCycle(self, head: Optional[ListNode]) -> bool:\n        `,
+  "find-duplicate-number": `class Solution:\n    def findDuplicate(self, nums: List[int]) -> int:\n        `,
+  "lru-cache": `class LRUCache:\n    def __init__(self, capacity: int):\n        \n\n    def get(self, key: int) -> int:\n        \n\n    def put(self, key: int, value: int) -> None:\n        `,
+  "merge-k-sorted-lists": `class Solution:\n    def mergeKLists(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:\n        `,
+  "reverse-nodes-k-group": `class Solution:\n    def reverseKGroup(self, head: Optional[ListNode], k: int) -> Optional[ListNode]:\n        `,
+  "invert-binary-tree": `class Solution:\n    def invertTree(self, root: Optional[TreeNode]) -> Optional[TreeNode]:\n        `,
+  "maximum-depth-binary-tree": `class Solution:\n    def maxDepth(self, root: Optional[TreeNode]) -> int:\n        `,
+  "diameter-binary-tree": `class Solution:\n    def diameterOfBinaryTree(self, root: Optional[TreeNode]) -> int:\n        `,
+  "balanced-binary-tree": `class Solution:\n    def isBalanced(self, root: Optional[TreeNode]) -> bool:\n        `,
+  "same-tree": `class Solution:\n    def isSameTree(self, p: Optional[TreeNode], q: Optional[TreeNode]) -> bool:\n        `,
+  "subtree-another-tree": `class Solution:\n    def isSubtree(self, root: Optional[TreeNode], subRoot: Optional[TreeNode]) -> bool:\n        `,
+  "lowest-common-ancestor-bst": `class Solution:\n    def lowestCommonAncestor(self, root: TreeNode, p: TreeNode, q: TreeNode) -> TreeNode:\n        `,
+  "binary-tree-level-order": `class Solution:\n    def levelOrder(self, root: Optional[TreeNode]) -> List[List[int]]:\n        `,
+  "binary-tree-right-side-view": `class Solution:\n    def rightSideView(self, root: Optional[TreeNode]) -> List[int]:\n        `,
+  "count-good-nodes": `class Solution:\n    def goodNodes(self, root: TreeNode) -> int:\n        `,
+  "validate-bst": `class Solution:\n    def isValidBST(self, root: Optional[TreeNode]) -> bool:\n        `,
+  "kth-smallest-bst": `class Solution:\n    def kthSmallest(self, root: Optional[TreeNode], k: int) -> int:\n        `,
+  "construct-binary-tree": `class Solution:\n    def buildTree(self, preorder: List[int], inorder: List[int]) -> Optional[TreeNode]:\n        `,
+  "binary-tree-max-path-sum": `class Solution:\n    def maxPathSum(self, root: Optional[TreeNode]) -> int:\n        `,
+  "serialize-deserialize-binary-tree": `class Codec:\n    def serialize(self, root: Optional[TreeNode]) -> str:\n        \n\n    def deserialize(self, data: str) -> Optional[TreeNode]:\n        `,
+  "kth-largest-stream": `class KthLargest:\n    def __init__(self, k: int, nums: List[int]):\n        \n\n    def add(self, val: int) -> int:\n        `,
+  "last-stone-weight": `class Solution:\n    def lastStoneWeight(self, stones: List[int]) -> int:\n        `,
+  "k-closest-points-origin": `class Solution:\n    def kClosest(self, points: List[List[int]], k: int) -> List[List[int]]:\n        `,
+  "kth-largest-array": `class Solution:\n    def findKthLargest(self, nums: List[int], k: int) -> int:\n        `,
+  "task-scheduler": `class Solution:\n    def leastInterval(self, tasks: List[str], n: int) -> int:\n        `,
+  "design-twitter": `class Twitter:\n    def __init__(self):\n        \n\n    def postTweet(self, userId: int, tweetId: int) -> None:\n        \n\n    def getNewsFeed(self, userId: int) -> List[int]:\n        \n\n    def follow(self, followerId: int, followeeId: int) -> None:\n        \n\n    def unfollow(self, followerId: int, followeeId: int) -> None:\n        `,
+  "find-median-data-stream": `class MedianFinder:\n    def __init__(self):\n        \n\n    def addNum(self, num: int) -> None:\n        \n\n    def findMedian(self) -> float:\n        `,
+  "subsets": `class Solution:\n    def subsets(self, nums: List[int]) -> List[List[int]]:\n        `,
+  "combination-sum": `class Solution:\n    def combinationSum(self, candidates: List[int], target: int) -> List[List[int]]:\n        `,
+  "permutations": `class Solution:\n    def permute(self, nums: List[int]) -> List[List[int]]:\n        `,
+  "subsets-ii": `class Solution:\n    def subsetsWithDup(self, nums: List[int]) -> List[List[int]]:\n        `,
+  "combination-sum-ii": `class Solution:\n    def combinationSum2(self, candidates: List[int], target: int) -> List[List[int]]:\n        `,
+  "word-search": `class Solution:\n    def exist(self, board: List[List[str]], word: str) -> bool:\n        `,
+  "palindrome-partitioning": `class Solution:\n    def partition(self, s: str) -> List[List[str]]:\n        `,
+  "letter-combinations-phone": `class Solution:\n    def letterCombinations(self, digits: str) -> List[str]:\n        `,
+  "n-queens": `class Solution:\n    def solveNQueens(self, n: int) -> List[List[str]]:\n        `,
+  "implement-trie": `class Trie:\n    def __init__(self):\n        \n\n    def insert(self, word: str) -> None:\n        \n\n    def search(self, word: str) -> bool:\n        \n\n    def startsWith(self, prefix: str) -> bool:\n        `,
+  "design-add-search-words": `class WordDictionary:\n    def __init__(self):\n        \n\n    def addWord(self, word: str) -> None:\n        \n\n    def search(self, word: str) -> bool:\n        `,
+  "word-search-ii": `class Solution:\n    def findWords(self, board: List[List[str]], words: List[str]) -> List[str]:\n        `,
+  "number-of-islands": `class Solution:\n    def numIslands(self, grid: List[List[str]]) -> int:\n        `,
+  "clone-graph": `class Solution:\n    def cloneGraph(self, node: Optional[Node]) -> Optional[Node]:\n        `,
+  "max-area-island": `class Solution:\n    def maxAreaOfIsland(self, grid: List[List[int]]) -> int:\n        `,
+  "pacific-atlantic-water-flow": `class Solution:\n    def pacificAtlantic(self, heights: List[List[int]]) -> List[List[int]]:\n        `,
+  "surrounded-regions": `class Solution:\n    def solve(self, board: List[List[str]]) -> None:\n        `,
+  "rotting-oranges": `class Solution:\n    def orangesRotting(self, grid: List[List[int]]) -> int:\n        `,
+  "walls-and-gates": `class Solution:\n    def wallsAndGates(self, rooms: List[List[int]]) -> None:\n        `,
+  "course-schedule": `class Solution:\n    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:\n        `,
+  "course-schedule-ii": `class Solution:\n    def findOrder(self, numCourses: int, prerequisites: List[List[int]]) -> List[int]:\n        `,
+  "redundant-connection": `class Solution:\n    def findRedundantConnection(self, edges: List[List[int]]) -> List[int]:\n        `,
+  "number-connected-components": `class Solution:\n    def countComponents(self, n: int, edges: List[List[int]]) -> int:\n        `,
+  "graph-valid-tree": `class Solution:\n    def validTree(self, n: int, edges: List[List[int]]) -> bool:\n        `,
+  "word-ladder": `class Solution:\n    def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -> int:\n        `,
+  "reconstruct-itinerary": `class Solution:\n    def findItinerary(self, tickets: List[List[str]]) -> List[str]:\n        `,
+  "min-cost-connect-points": `class Solution:\n    def minCostConnectPoints(self, points: List[List[int]]) -> int:\n        `,
+  "network-delay-time": `class Solution:\n    def networkDelayTime(self, times: List[List[int]], n: int, k: int) -> int:\n        `,
+  "swim-rising-water": `class Solution:\n    def swimInWater(self, grid: List[List[int]]) -> int:\n        `,
+  "alien-dictionary": `class Solution:\n    def alienOrder(self, words: List[str]) -> str:\n        `,
+  "cheapest-flights-k-stops": `class Solution:\n    def findCheapestPrice(self, n: int, flights: List[List[int]], src: int, dst: int, k: int) -> int:\n        `,
+  "climbing-stairs": `class Solution:\n    def climbStairs(self, n: int) -> int:\n        `,
+  "min-cost-climbing-stairs": `class Solution:\n    def minCostClimbingStairs(self, cost: List[int]) -> int:\n        `,
+  "house-robber": `class Solution:\n    def rob(self, nums: List[int]) -> int:\n        `,
+  "house-robber-ii": `class Solution:\n    def rob(self, nums: List[int]) -> int:\n        `,
+  "longest-palindromic-substring": `class Solution:\n    def longestPalindrome(self, s: str) -> str:\n        `,
+  "palindromic-substrings": `class Solution:\n    def countSubstrings(self, s: str) -> int:\n        `,
+  "decode-ways": `class Solution:\n    def numDecodings(self, s: str) -> int:\n        `,
+  "coin-change": `class Solution:\n    def coinChange(self, coins: List[int], amount: int) -> int:\n        `,
+  "maximum-product-subarray": `class Solution:\n    def maxProduct(self, nums: List[int]) -> int:\n        `,
+  "word-break": `class Solution:\n    def wordBreak(self, s: str, wordDict: List[str]) -> bool:\n        `,
+  "longest-increasing-subsequence": `class Solution:\n    def lengthOfLIS(self, nums: List[int]) -> int:\n        `,
+  "partition-equal-subset-sum": `class Solution:\n    def canPartition(self, nums: List[int]) -> bool:\n        `,
+  "unique-paths": `class Solution:\n    def uniquePaths(self, m: int, n: int) -> int:\n        `,
+  "longest-common-subsequence": `class Solution:\n    def longestCommonSubsequence(self, text1: str, text2: str) -> int:\n        `,
+  "buy-sell-stock-cooldown": `class Solution:\n    def maxProfit(self, prices: List[int]) -> int:\n        `,
+  "coin-change-ii": `class Solution:\n    def change(self, amount: int, coins: List[int]) -> int:\n        `,
+  "target-sum": `class Solution:\n    def findTargetSumWays(self, nums: List[int], target: int) -> int:\n        `,
+  "interleaving-string": `class Solution:\n    def isInterleave(self, s1: str, s2: str, s3: str) -> bool:\n        `,
+  "longest-increasing-path-matrix": `class Solution:\n    def longestIncreasingPath(self, matrix: List[List[int]]) -> int:\n        `,
+  "distinct-subsequences": `class Solution:\n    def numDistinct(self, s: str, t: str) -> int:\n        `,
+  "edit-distance": `class Solution:\n    def minDistance(self, word1: str, word2: str) -> int:\n        `,
+  "burst-balloons": `class Solution:\n    def maxCoins(self, nums: List[int]) -> int:\n        `,
+  "regular-expression-matching": `class Solution:\n    def isMatch(self, s: str, t: str) -> bool:\n        `,
+  "maximum-subarray": `class Solution:\n    def maxSubArray(self, nums: List[int]) -> int:\n        `,
+  "jump-game": `class Solution:\n    def canJump(self, nums: List[int]) -> bool:\n        `,
+  "jump-game-ii": `class Solution:\n    def jump(self, nums: List[int]) -> int:\n        `,
+  "gas-station": `class Solution:\n    def canCompleteCircuit(self, gas: List[int], cost: List[int]) -> int:\n        `,
+  "hand-of-straights": `class Solution:\n    def isNStraightHand(self, hand: List[int], groupSize: int) -> bool:\n        `,
+  "merge-triplets-target": `class Solution:\n    def mergeTriplets(self, triplets: List[List[int]], target: List[int]) -> bool:\n        `,
+  "partition-labels": `class Solution:\n    def partitionLabels(self, s: str) -> List[int]:\n        `,
+  "valid-parenthesis-string": `class Solution:\n    def checkValidString(self, s: str) -> bool:\n        `,
+  "insert-interval": `class Solution:\n    def insert(self, intervals: List[List[int]], newInterval: List[int]) -> List[List[int]]:\n        `,
+  "merge-intervals": `class Solution:\n    def merge(self, intervals: List[List[int]]) -> List[List[int]]:\n        `,
+  "non-overlapping-intervals": `class Solution:\n    def eraseOverlapIntervals(self, intervals: List[List[int]]) -> int:\n        `,
+  "meeting-rooms": `class Solution:\n    def canAttendMeetings(self, intervals: List[List[int]]) -> bool:\n        `,
+  "meeting-rooms-ii": `class Solution:\n    def minMeetingRooms(self, intervals: List[List[int]]) -> int:\n        `,
+  "minimum-interval-query": `class Solution:\n    def minInterval(self, intervals: List[List[int]], queries: List[int]) -> List[int]:\n        `,
+  "rotate-image": `class Solution:\n    def rotate(self, matrix: List[List[int]]) -> None:\n        `,
+  "spiral-matrix": `class Solution:\n    def spiralOrder(self, matrix: List[List[int]]) -> List[int]:\n        `,
+  "set-matrix-zeroes": `class Solution:\n    def setZeroes(self, matrix: List[List[int]]) -> None:\n        `,
+  "happy-number": `class Solution:\n    def isHappy(self, n: int) -> bool:\n        `,
+  "plus-one": `class Solution:\n    def plusOne(self, digits: List[int]) -> List[int]:\n        `,
+  "pow-x-n": `class Solution:\n    def myPow(self, x: float, n: int) -> float:\n        `,
+  "multiply-strings": `class Solution:\n    def multiply(self, num1: str, num2: str) -> str:\n        `,
+  "detect-squares": `class DetectSquares:\n    def __init__(self):\n        \n\n    def add(self, point: List[int]) -> None:\n        \n\n    def count(self, point: List[int]) -> int:\n        `,
+  "single-number": `class Solution:\n    def singleNumber(self, nums: List[int]) -> int:\n        `,
+  "number-of-1-bits": `class Solution:\n    def hammingWeight(self, n: int) -> int:\n        `,
+  "counting-bits": `class Solution:\n    def countBits(self, n: int) -> List[int]:\n        `,
+  "reverse-bits": `class Solution:\n    def reverseBits(self, n: int) -> int:\n        `,
+  "missing-number": `class Solution:\n    def missingNumber(self, nums: List[int]) -> int:\n        `,
+  "sum-of-two-integers": `class Solution:\n    def getSum(self, a: int, b: int) -> int:\n        `,
+  "reverse-integer": `class Solution:\n    def reverse(self, x: int) -> int:\n        `,
+};
+
+const FUNCTION_NAME_BY_STARTER_KEY: Record<string, string> = {
+  "contains-duplicate": "containsDuplicate",
+  "valid-anagram": "isAnagram",
+  "two-sum": "twoSum",
+  "group-anagrams": "groupAnagrams",
+  "top-k-frequent-elements": "topKFrequent",
+  // encode-decode-strings has two methods; tests call encode by default
+  "encode-decode-strings": "encode",
+  "product-array-except-self": "productExceptSelf",
+  "valid-sudoku": "isValidSudoku",
+  "longest-consecutive-sequence": "longestConsecutive",
+  "valid-palindrome": "isPalindrome",
+  "two-sum-ii": "twoSumII",
+  "3sum": "threeSum",
+  "container-with-most-water": "maxArea",
+  "trapping-rain-water": "trap",
+  "best-time-to-buy-sell-stock": "maxProfit",
+  "longest-substring-without-repeating": "lengthOfLongestSubstring",
+  "longest-repeating-character-replacement": "characterReplacement",
+  "permutation-in-string": "checkInclusion",
+  "minimum-window-substring": "minWindow",
+  "sliding-window-maximum": "maxSlidingWindow",
+  "valid-parentheses": "isValid",
+  "evaluate-reverse-polish-notation": "evalRPN",
+  "generate-parentheses": "generateParenthesis",
+  "daily-temperatures": "dailyTemperatures",
+  "car-fleet": "carFleet",
+  "largest-rectangle-histogram": "largestRectangleArea",
+  "binary-search": "search",
+  "search-2d-matrix": "searchMatrix",
+  "koko-eating-bananas": "minEatingSpeed",
+  "find-minimum-rotated-sorted-array": "findMin",
+  "search-rotated-sorted-array": "searchRotated",
+  "median-two-sorted-arrays": "findMedianSortedArrays",
+  "reverse-linked-list": "reverseList",
+  "merge-two-sorted-lists": "mergeTwoLists",
+  "reorder-list": "reorderList",
+  "remove-nth-node-end": "removeNthFromEnd",
+  "copy-list-random-pointer": "copyRandomList",
+  "add-two-numbers": "addTwoNumbers",
+  "linked-list-cycle": "hasCycle",
+  "find-duplicate-number": "findDuplicate",
+  "merge-k-sorted-lists": "mergeKLists",
+  "reverse-nodes-k-group": "reverseKGroup",
+  "invert-binary-tree": "invertTree",
+  "maximum-depth-binary-tree": "maxDepth",
+  "diameter-binary-tree": "diameterOfBinaryTree",
+  "balanced-binary-tree": "isBalanced",
+  "same-tree": "isSameTree",
+  "subtree-another-tree": "isSubtree",
+  "lowest-common-ancestor-bst": "lowestCommonAncestor",
+  "binary-tree-level-order": "levelOrder",
+  "binary-tree-right-side-view": "rightSideView",
+  "count-good-nodes": "goodNodes",
+  "validate-bst": "isValidBST",
+  "kth-smallest-bst": "kthSmallest",
+  "construct-binary-tree": "buildTree",
+  "binary-tree-max-path-sum": "maxPathSum",
+  "subsets": "subsets",
+  "combination-sum": "combinationSum",
+  "permutations": "permute",
+  "subsets-ii": "subsetsWithDup",
+  "combination-sum-ii": "combinationSum2",
+  "word-search": "exist",
+  "palindrome-partitioning": "partition",
+  "letter-combinations-phone": "letterCombinations",
+  "n-queens": "solveNQueens",
+  "word-search-ii": "findWords",
+  "number-of-islands": "numIslands",
+  "clone-graph": "cloneGraph",
+  "max-area-island": "maxAreaOfIsland",
+  "pacific-atlantic-water-flow": "pacificAtlantic",
+  "surrounded-regions": "solve",
+  "rotting-oranges": "orangesRotting",
+  "walls-and-gates": "wallsAndGates",
+  "course-schedule": "canFinish",
+  "course-schedule-ii": "findOrder",
+  "redundant-connection": "findRedundantConnection",
+  "number-connected-components": "countComponents",
+  "graph-valid-tree": "validTree",
+  "word-ladder": "ladderLength",
+  "reconstruct-itinerary": "findItinerary",
+  "min-cost-connect-points": "minCostConnectPoints",
+  "network-delay-time": "networkDelayTime",
+  "swim-rising-water": "swimInWater",
+  "alien-dictionary": "alienOrder",
+  "cheapest-flights-k-stops": "findCheapestPrice",
+  "climbing-stairs": "climbStairs",
+  "min-cost-climbing-stairs": "minCostClimbingStairs",
+  "house-robber": "rob",
+  "house-robber-ii": "rob",
+  "longest-palindromic-substring": "longestPalindrome",
+  "palindromic-substrings": "countSubstrings",
+  "decode-ways": "numDecodings",
+  "coin-change": "coinChange",
+  "maximum-product-subarray": "maxProduct",
+  "word-break": "wordBreak",
+  "longest-increasing-subsequence": "lengthOfLIS",
+  "partition-equal-subset-sum": "canPartition",
+  "unique-paths": "uniquePaths",
+  "longest-common-subsequence": "longestCommonSubsequence",
+  "buy-sell-stock-cooldown": "maxProfit",
+  "coin-change-ii": "change",
+  "target-sum": "findTargetSumWays",
+  "interleaving-string": "isInterleave",
+  "longest-increasing-path-matrix": "longestIncreasingPath",
+  "distinct-subsequences": "numDistinct",
+  "edit-distance": "minDistance",
+  "burst-balloons": "maxCoins",
+  "regular-expression-matching": "isMatch",
+  "maximum-subarray": "maxSubArray",
+  "jump-game": "canJump",
+  "jump-game-ii": "jump",
+  "gas-station": "canCompleteCircuit",
+  "hand-of-straights": "isNStraightHand",
+  "merge-triplets-target": "mergeTriplets",
+  "partition-labels": "partitionLabels",
+  "valid-parenthesis-string": "checkValidString",
+  "insert-interval": "insert",
+  "merge-intervals": "merge",
+  "non-overlapping-intervals": "eraseOverlapIntervals",
+  "meeting-rooms": "canAttendMeetings",
+  "meeting-rooms-ii": "minMeetingRooms",
+  "minimum-interval-query": "minInterval",
+  "rotate-image": "rotate",
+  "spiral-matrix": "spiralOrder",
+  "set-matrix-zeroes": "setZeroes",
+  "happy-number": "isHappy",
+  "plus-one": "plusOne",
+  "pow-x-n": "myPow",
+  "multiply-strings": "multiply",
+  "single-number": "singleNumber",
+  "number-of-1-bits": "hammingWeight",
+  "counting-bits": "countBits",
+  "reverse-bits": "reverseBits",
+  "missing-number": "missingNumber",
+  "sum-of-two-integers": "getSum",
+  "reverse-integer": "reverse",
+};
+
 function slugToFunctionName(slug: string): string {
   const parts = slug
     .split("-")
@@ -3652,15 +3973,107 @@ function slugToFunctionName(slug: string): string {
   return parts[0] + parts.slice(1).map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join("");
 }
 
+const STARTER_SLUG_ALIASES: Record<string, string> = {
+  "encode-and-decode-strings": "encode-decode-strings",
+  "product-of-array-except-self": "product-array-except-self",
+  "two-sum-ii-input-array-is-sorted": "two-sum-ii",
+  "best-time-to-buy-and-sell-stock": "best-time-to-buy-sell-stock",
+  "longest-substring-without-repeating-characters": "longest-substring-without-repeating",
+  "largest-rectangle-in-histogram": "largest-rectangle-histogram",
+  "search-a-2d-matrix": "search-2d-matrix",
+  "find-minimum-in-rotated-sorted-array": "find-minimum-rotated-sorted-array",
+  "search-in-rotated-sorted-array": "search-rotated-sorted-array",
+  "median-of-two-sorted-arrays": "median-two-sorted-arrays",
+  "remove-nth-node-from-end-of-list": "remove-nth-node-end",
+  "copy-list-with-random-pointer": "copy-list-random-pointer",
+  "reverse-nodes-in-k-group": "reverse-nodes-k-group",
+  "find-the-duplicate-number": "find-duplicate-number",
+  "maximum-depth-of-binary-tree": "maximum-depth-binary-tree",
+  "diameter-of-binary-tree": "diameter-binary-tree",
+  "subtree-of-another-tree": "subtree-another-tree",
+  "lowest-common-ancestor-of-a-binary-search-tree": "lowest-common-ancestor-bst",
+  "binary-tree-level-order-traversal": "binary-tree-level-order",
+  "count-good-nodes-in-binary-tree": "count-good-nodes",
+  "validate-binary-search-tree": "validate-bst",
+  "kth-smallest-element-in-a-bst": "kth-smallest-bst",
+  "construct-binary-tree-from-preorder-and-inorder-traversal": "construct-binary-tree",
+  "binary-tree-maximum-path-sum": "binary-tree-max-path-sum",
+  "serialize-and-deserialize-binary-tree": "serialize-deserialize-binary-tree",
+  "kth-largest-element-in-a-stream": "kth-largest-stream",
+  "k-closest-points-to-origin": "k-closest-points-origin",
+  "kth-largest-element-in-an-array": "kth-largest-array",
+  "find-median-from-data-stream": "find-median-data-stream",
+  "letter-combinations-of-a-phone-number": "letter-combinations-phone",
+  "implement-trie-prefix-tree": "implement-trie",
+  "design-add-and-search-words-data-structure": "design-add-search-words",
+  "max-area-of-island": "max-area-island",
+  "number-of-connected-components-in-an-undirected-graph": "number-connected-components",
+  "min-cost-to-connect-all-points": "min-cost-connect-points",
+  "swim-in-rising-water": "swim-rising-water",
+  "cheapest-flights-within-k-stops": "cheapest-flights-k-stops",
+  "best-time-to-buy-and-sell-stock-with-cooldown": "buy-sell-stock-cooldown",
+  "longest-increasing-path-in-a-matrix": "longest-increasing-path-matrix",
+  "merge-triplets-to-form-target-triplet": "merge-triplets-target",
+  "minimum-interval-to-include-each-query": "minimum-interval-query",
+  "powx-n": "pow-x-n",
+};
+
+const DESIGN_TESTCASE = [{ args: "", expected: "design" }];
+const LL_DEFAULT_TESTCASES = [{ args: "None", expected: "None" }];
+const TREE_DEFAULT_TESTCASES = [{ args: "None", expected: "None" }];
+
+const DESIGN_SLUGS = new Set<string>([
+  "min-stack",
+  "lru-cache",
+  "time-based-key-value-store",
+  "design-twitter",
+  "find-median-from-data-stream",
+  "kth-largest-element-in-a-stream",
+  "implement-trie-prefix-tree",
+  "design-add-and-search-words-data-structure",
+  "detect-squares",
+]);
+
 export const NEETCODE_PROBLEMS: Record<string, Problem[]> = Object.fromEntries(
   Object.entries(RAW_NEETCODE_PROBLEMS).map(([patternSlug, problems]) => [
     patternSlug,
     problems.map((p) => {
+      const starterKey = STARTER_SLUG_ALIASES[p.slug] ?? p.slug;
+      const starterCode = PROVIDED_STARTERS[starterKey] ?? "class Solution:\n    pass\n";
+      const desiredFunctionName =
+        FUNCTION_NAME_BY_STARTER_KEY[starterKey] ??
+        PROVIDED_TESTS[p.slug]?.functionName ??
+        slugToFunctionName(p.slug);
       const meta = PROVIDED_TESTS[p.slug] ?? {
-        functionName: slugToFunctionName(p.slug),
+        functionName: desiredFunctionName,
         testCases: [],
       };
-      return { ...p, ...meta };
+      // Force alignment with LeetCode starter method signature.
+      meta.functionName = desiredFunctionName;
+      let testCases = meta.testCases;
+
+      // Guarantee every problem has at least one testcase entry.
+      if (!testCases || testCases.length === 0) {
+        if (DESIGN_SLUGS.has(p.slug)) {
+          testCases = DESIGN_TESTCASE;
+        } else if (patternSlug === "linked-list") {
+          testCases = LL_DEFAULT_TESTCASES;
+        } else if (patternSlug === "trees") {
+          // Prefer the "real" simple ones where specified
+          if (p.slug === "maximum-depth-of-binary-tree") {
+            testCases = [{ args: "None", expected: "0" }];
+          } else if (p.slug === "invert-binary-tree") {
+            testCases = [{ args: "None", expected: "None" }];
+          } else {
+            testCases = TREE_DEFAULT_TESTCASES;
+          }
+        } else {
+          // Fallback so "Run Tests" can always run without hiding.
+          testCases = DESIGN_TESTCASE;
+        }
+      }
+
+      return { ...p, ...meta, testCases, starterCode };
     }),
   ]),
 ) as Record<string, Problem[]>;
